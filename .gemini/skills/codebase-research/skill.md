@@ -30,8 +30,9 @@ This skill enables Gemini CLI to systematically research external GitHub reposit
 - **Check Context First**: After each round, evaluate if current context is sufficient to answer the query. If YES, stop early.
 
 ### 4. Phase 3: Synthesize (Generate Digest)
-- Create a markdown file at `<folder>/<repo-name>-digest.md` using the template below.
+- Create a markdown file at `<folder>/<repo-name>-digest-YYYYMMDD.md` using the template below.
 - Focus on architectural patterns, data flow, and key logic discovered during iterative analysis.
+- Ensure the filename follows the kebab-case naming convention (e.g., `react-digest-20260321.md`).
 
 ### 5. Cleanup
 - Remove the temporary cloned repository.
