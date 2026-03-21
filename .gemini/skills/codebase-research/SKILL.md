@@ -13,10 +13,10 @@ This skill enables Gemini CLI to systematically research external GitHub reposit
 
 ### 1. Identify Target
 - Get the GitHub URL and determine the destination folder (`digest/skills/`, `digest/tools/`, or `digest/workflow/`).
-- Use `research_repo.cjs` to clone the repository into a temporary directory.
+- Use `research-repo.cjs` to clone the repository into a temporary directory.
 
 ### 2. Phase 1: Discovery (File Selection)
-- **Query Rewriting**: Transform natural language questions into technical code search keywords using `references/SEMANTIC_MAPPINGS.md`.
+- **Query Rewriting**: Transform natural language questions into technical code search keywords using `references/semantic-mappings.md`.
 - **Initial Discovery**:
   - Read `README.md` and configuration files (`package.json`, `go.mod`, etc.).
   - Locate entry points (e.g., `src/index.ts`, `main.go`, `app.py`).
@@ -74,9 +74,9 @@ This skill enables Gemini CLI to systematically research external GitHub reposit
 
 ## Resources
 
-### scripts/research_repo.cjs
+### scripts/research-repo.cjs
 A utility to clone a repository to a temporary location and provide a summary of its structure.
-**Usage**: `node scripts/research_repo.cjs <repo-url>`
+**Usage**: `node scripts/research-repo.cjs <repo-url>`
 
-### references/SEMANTIC_MAPPINGS.md
+### references/semantic-mappings.md
 A mapping of conceptual terms to code keywords for better discovery.

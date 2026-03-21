@@ -5,15 +5,15 @@ Codebase Research Skill - Core Implementation
 Intelligent codebase exploration using LLM-guided discovery and tree-sitter AST parsing.
 
 Usage:
-    python codebase_research.py <mode> <query> <scope_path> [--language LANG]
+    python codebase-research.py <mode> <query> <scope_path> [--language LANG]
 
 Modes:
     find     - Locate specific logic (functions, classes, patterns)
     explore  - Understand architecture (components, data flow, design patterns)
 
 Examples:
-    python codebase_research.py find "authenticate_user" /path/to/project --language python
-    python codebase_research.py explore "messaging system" /path/to/project --language typescript
+    python codebase-research.py find "authenticate_user" /path/to/project --language python
+    python codebase-research.py explore "messaging system" /path/to/project --language typescript
 """
 
 import sys
@@ -988,7 +988,7 @@ def main():
 
     if not file_paths:
         print("Error: No files provided. Pipe file paths to stdin.", file=sys.stderr)
-        print("Example: find /path -name '*.py' | python codebase_research.py find 'query' /path", file=sys.stderr)
+        print("Example: find /path -name '*.py' | python codebase-research.py find 'query' /path", file=sys.stderr)
         sys.exit(1)
 
     # Rewrite query to keywords

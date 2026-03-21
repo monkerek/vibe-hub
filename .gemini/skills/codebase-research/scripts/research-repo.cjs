@@ -6,7 +6,7 @@ const os = require('os');
 function main() {
   const args = process.argv.slice(2);
   if (args.length < 1) {
-    console.error('Usage: node research_repo.cjs <repo-url>');
+    console.error('Usage: node research-repo.cjs <repo-url>');
     process.exit(1);
   }
 
@@ -35,8 +35,8 @@ function main() {
     console.log('\n--- Discovery Options ---');
     console.log(`1. Basic: Use 'grep_search' and 'read_file' in ${tempDir}`);
     console.log(`2. Advanced: Run Python analyzer (requires tree-sitter):`);
-    console.log(`   python3 .gemini/skills/codebase-research/scripts/codebase_research.py find "auth" ${tempDir}`);
-    console.log(`\nFollow the optimized workflow in .gemini/skills/codebase-research/SKILL.md`);
+    console.log(`   python3 .gemini/skills/codebase-research/scripts/codebase-research.py find "auth" ${tempDir}`);
+    console.log(`\nFollow the optimized workflow in .gemini/skills/codebase-research/skill.md`);
   } catch (err) {
     console.error(`Failed to clone repository: ${err.message}`);
     process.exit(1);

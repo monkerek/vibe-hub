@@ -15,7 +15,7 @@ A personal project for researching and learning about various codebases, tools, 
 ## 🛠 Skills
 
 ### `codebase-research`
-The `codebase-research` skill automates the process of investigating external repositories. It includes a script (`research_repo.cjs`) that clones a target repository into a temporary workspace, allowing for deep-dive analysis without cluttering the main project.
+The `codebase-research` skill automates the process of investigating external repositories. It includes a script (`research-repo.cjs`) that clones a target repository into a temporary workspace, allowing for deep-dive analysis without cluttering the main project.
 
 #### Usage
 To research a new repository:
