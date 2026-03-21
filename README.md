@@ -34,6 +34,7 @@ Currently available research:
 | [gstack](digest/skills/gstack-digest.md) | Skill | Garry Tan's "software factory" with 15+ specialized agent roles. |
 | [nanoclaw](digest/tools/nanoclaw-digest.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
 | [nopua](digest/skills/nopua-digest.md) | Skill | Trust-driven AI prompting inspired by the *Dao De Jing*. |
+| [ghostty](digest/tools/ghostty-digest.md) | Tool | Fast, native, feature-rich terminal emulator written in Zig. |
 
 ## ⚖️ License
 MIT
