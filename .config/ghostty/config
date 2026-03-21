@@ -40,3 +40,5 @@ scrollback-limit = 25000000
 keybind = cmd+d=new_split:right
 keybind = cmd+shift+enter=toggle_split_zoom
 keybind = cmd+shift+f=toggle_split_zoom
+keybind = cmd+shift+left=previous_tab
+keybind = cmd+shift+right=next_tab
