@@ -1,49 +1,44 @@
 # Vibe Hub
 
-A personal project for researching and learning about various codebases, tools, and agentic workflows. This repository uses the Gemini CLI and custom skills to analyze external repositories and generate structured digests.
+A personal project for researching and learning about various codebases, tools, and agentic workflows. This repository is optimized for multi-agent collaboration, supporting Gemini CLI, Claude Code, and Codex CLI with unified context and shared skills.
 
 ## 📂 Project Structure
 
-- **`.vibe/skills/`**: Shared "source of truth" for agentic intelligence. Supporting Gemini CLI, Claude Code, and Codex CLI via platform-specific symlinks.
-  - **`codebase-research/`**: Automates the workflow to research GitHub repositories and generate architectural documentation.
-  - **`doc-research/`**: Transforms complex documents (papers, articles) into high-signal learning digests.
-  - **`no-gaslighting/`**: An anti-manipulation skill to drive AI with trust and inner motivation.
-  - **`skill-authoring/`**: Meta-skill to enforce high-quality skill creation standards.
+- **`.vibe/`**: Shared "source of truth" for agentic intelligence.
+  - **`skills/`**: Standardized agent skills (symlinked for all agent platforms).
+  - **`README.md`**: Guide for cross-agent setup.
+- **`.gemini/`, `.claude/`, `.codex/`**: Platform-specific directories containing symlinks to shared skills and context.
 - **`digest/`**: A structured directory containing research digests.
-  - **`skills/`**: Research focused on specialized agent skills and workflows.
-  - **`tools/`**: Research focused on AI-native tools and platforms.
-  - **`workflow/`**: Research focused on end-to-end development processes.
-  - **`paper/`**: Deep-dives into academic papers and technical articles.
+  - **`skills/`**, **`tools/`**, **`workflow/`**, **`paper/`**: Research categorized by type.
+- **`.config/`**: Managed system configurations (dotfiles) for Ghostty, Starship, etc.
+
+## 🛡️ Multi-Agent Context (Vibe Protocol)
+
+The project uses a unified context system to ensure all AI agents follow the same mandates and SOPs:
+
+| Platform | Entry Point | Source File | Standard |
+| :--- | :--- | :--- | :--- |
+| **Gemini CLI** | `GEMINI.md` | `.viberc.md` | [Gemini MD](https://geminicli.com/docs/cli/gemini-md/) |
+| **Claude Code** | `CLAUDE.md` | `.claudevibe.md` | [Claude Memory](https://code.claude.com/docs/en/memory) |
+| **Codex CLI** | `AGENTS.md` | `.agentsvibe.md` | [Codex Agents](https://developers.openai.com/codex/guides/agents-md) |
+
+## ⚖️ Core Mandates
+
+1. **Naming**: ALWAYS use `aaa-bbb.cc` (kebab-case) for all filenames.
+2. **Digests**: Research digests MUST follow the `<repo-name>-digest-YYYYMMDD.md` pattern.
+3. **Workflow**: Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize) documented in `.viberc.md`.
+4. **Isolation**: Use `git worktree` for tasks to avoid overlapping with other agents.
 
 ## 🛠 Skills
 
-### `codebase-research`
-Automates the process of investigating external repositories using an iterative 3-phase workflow (Discovery, Prefetch, Synthesize).
-
-### `doc-research`
-Systematically evaluates and digests academic papers and technical articles using specialized methodologies like academic reviewer passes.
-
-### `skill-authoring`
-Ensures all skills follow the [Claude best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices). It enforces gerund naming, third-person descriptions, and structured SOPs.
-
-### `no-gaslighting`
-Adapted from the [`nopua`](https://github.com/wuji-labs/nopua) project, this skill replaces fear-based tactics with trust-driven motivation and a systematic debugging process.
+- **`codebase-research`**: Iterative repository analysis and architectural mapping.
+- **`doc-research`**: Systematic evaluation of academic papers and technical articles.
+- **`no-gaslighting`**: Trust-driven debugging and root cause analysis.
+- **`skill-authoring`**: Enforces project-specific standards for all new skills.
 
 ## 🚀 Research Digests
 
-Currently available research:
-
-| Project | Category | Summary |
-|---------|----------|---------|
-| [superpowers](digest/workflow/superpowers-digest-20260321.md) | Workflow | Composable skills for agentic TDD, brainstorming, and debugging. |
-| [gws](digest/tools/gws-digest-20260321.md) | Tool | Dynamic Google Workspace CLI with 40+ agent skills. |
-| [gstack](digest/skills/gstack-digest-20260321.md) | Skill | Garry Tan's "software factory" with 15+ specialized agent roles. |
-| [lazygit](digest/tools/lazygit-digest-20260321.md) | Tool | Terminal UI for git commands with interactive rebasing and staging. |
-| [nanoclaw](digest/tools/nanoclaw-digest-20260321.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
-| [nopua](digest/skills/nopua-digest-20260321.md) | Skill | Trust-driven AI prompting inspired by the *Dao De Jing*. |
-| [ghostty](digest/tools/ghostty-digest-20260321.md) | Tool | Fast, native, feature-rich terminal emulator written in Zig. |
-| [starship](digest/tools/starship-digest-20260321.md) | Tool | Minimal, blazing-fast, and customizable prompt for any shell. |
-| [Attention Is All You Need](digest/paper/attention-is-all-you-need-digest-20260321.md) | Paper | The foundational paper on the Transformer architecture. |
+Refer to the tables in individual `digest/` subdirectories or the main `README.md` history for the full list of research (e.g., `gws`, `lazygit`, `ghostty`, `starship`, etc.).
 
 ## ⚖️ License
 MIT
