@@ -23,6 +23,8 @@ To research a new repository:
 2. The skill will clone the repo and analyze its architecture, tech stack, and key features.
 3. A structured digest will be generated in `digest/skills/` or `digest/tools/`.
 
+### `skill-authoring`
+The `skill-authoring` meta-skill ensures all future skills in this project follow the [Claude best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices). It enforces gerund naming, third-person descriptions, and structured SOPs.
 ### `no-gaslighting`
 Adapted from the [`nopua`](https://github.com/wuji-labs/nopua) project, this skill replaces fear-based "PUA" tactics with trust-driven motivation. It provides a systematic debugging process (Water Methodology) and cognitive elevation strategies to resolve complex failures without toxic pressure.
 
