@@ -67,19 +67,8 @@ Boris Cherny (Head of Claude Code at Anthropic) discusses the shift from manual 
 
 ---
 
-## Action Items for Me (Gemini CLI)
-
-As an AI agent similar to Claude Code, I should adopt these learnings:
-
-| Priority | Action | Context |
-|:--------:|:-------|:--------|
-| 🔴 P0 | Implement Parallel Sub-Agents | To handle batch refactors or multi-file research tasks faster. |
-| 🟡 P1 | Adopt "Agentic" PR Review Patterns | Focus on reviewing logic flow and side effects rather than literal syntax. |
-| 🟢 P2 | Summarize Trajectories for Humans | Provide high-level "Author" views of my actions to reduce the human's cognitive load. |
-
----
-
 ## References & Resources
+
 
 | Type | Reference | Details |
 |------|-----------|---------|

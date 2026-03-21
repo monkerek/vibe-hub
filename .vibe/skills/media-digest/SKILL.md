@@ -9,6 +9,34 @@ description: Transform video and audio content (YouTube, Podcasts, Bilibili) int
 
 This skill enables Gemini CLI to systematically process video and audio content, extracting high-signal insights and generating structured digests. It handles long-form content (YouTube, Podcasts) via transcription and short-form content (<1 min) via frame-based spatial analysis.
 
+## 📦 Setup & Dependencies
+
+To use this skill, ensure the following dependencies are installed on your system:
+
+### 1. Media Extraction (yt-dlp)
+Used for fetching metadata and downloading audio/video.
+```bash
+brew install yt-dlp
+```
+
+### 2. YouTube Transcripts
+Used for fetching native/auto-generated YouTube transcripts via API.
+```bash
+pip install --break-system-packages youtube-transcript-api
+```
+
+### 3. Audio Processing (FFmpeg)
+Mandatory for frame extraction and audio conversion.
+```bash
+brew install ffmpeg
+```
+
+### 4. Transcription (Whisper)
+For platforms without native transcripts, use OpenAI Whisper API (requires `OPENAI_API_KEY`) or local `whisper-cpp`.
+```bash
+brew install whisper-cpp
+```
+
 ## <instructions>
 
 ### 1. Platform Detection & Metadata
@@ -23,11 +51,10 @@ This skill enables Gemini CLI to systematically process video and audio content,
 ### 3. Analysis & Synthesis
 - Segment the content into logical sections with timestamps.
 - Identify key claims, evidence, and "Devil's Advocate" critiques.
-- Generate personalized action items categorized by priority (P0/P1/P2).
-- Format the output using `templates/default.md`.
+- Format the output using `templates/default.md`. **Do not include action items.**
 
 ### 4. Verification & Output
-- **Verify**: Ensure timestamps match the transcript and action items are specific/actionable.
+- **Verify**: Ensure timestamps match the transcript and all key claims are grounded in the source.
 - **Output**: Save the digest to `digest/media/[platform]-[slug]-digest-YYYYMMDD.md`.
 - **Naming**: Use kebab-case for the slug and ensure the `YYYYMMDD` date suffix is present.
 
@@ -35,9 +62,9 @@ This skill enables Gemini CLI to systematically process video and audio content,
 
 ## <constraints>
 - **No Hallucination**: Only include insights and quotes directly supported by the transcript or metadata.
+- **No Action Items**: Focus strictly on synthesis and analysis of the content itself.
 - **Token Efficiency**: Use parallel tool calls for metadata fetching and speaker research.
 - **Privacy**: Delete any temporary audio files or extracted frames after the digest is generated.
-- **Compliance**: Follow the "Vibe Coding" aesthetic for visual descriptions in short-form analysis.
 </constraints>
 
 ## <workflow_checklist>
@@ -45,7 +72,6 @@ This skill enables Gemini CLI to systematically process video and audio content,
 - [ ] Research speaker/author background.
 - [ ] Extract transcript or frames (based on duration).
 - [ ] Segment content and identify key insights.
-- [ ] Generate action items and references.
 - [ ] Format output using `templates/default.md`.
 - [ ] Verify accuracy and naming conventions.
 </workflow_checklist>
@@ -62,10 +88,4 @@ Detailed guide for using `youtube-transcript-api`, OpenAI Whisper API, and local
 Frame extraction and spatial analysis methodology for videos under 60 seconds.
 
 ### templates/default.md
-Standard markdown template for all media digests, including metadata, TL;DR, and action items.
-
-## Dependencies
-- `yt-dlp` (Homebrew) for metadata and media extraction.
-- `ffmpeg` (Homebrew) for audio processing and frame extraction.
-- `whisper-cpp` or `openai` (Whisper API) for transcription.
-- `youtube-transcript-api` (Pip) for YouTube transcripts.
+Standard markdown template for all media digests, including metadata, TL;DR, and critical evaluation.

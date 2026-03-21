@@ -19,7 +19,6 @@ This is the default template for media digest output. Copy and modify to create 
 | `{{tags}}` | Generated tags | ["engineering", "career"] |
 | `{{tldr}}` | 2-3 sentence summary | "..." |
 | `{{sections}}` | Array of section objects | [...] |
-| `{{action_items}}` | Generated action items | [...] |
 | `{{references}}` | Mentioned resources | [...] |
 | `{{transcript}}` | Full transcript | "..." |
 
@@ -71,24 +70,6 @@ type: media-digest
 
 ---
 
-## Action Items for Me
-
-Based on this content, here's how I can apply these learnings:
-
-| Priority | Action | Context |
-|:--------:|:-------|:--------|
-{{#each action_items}}
-| {{this.priority_emoji}} | {{this.action}} | {{this.context}} |
-{{/each}}
-
-### Specific Next Steps
-
-{{#each action_items}}
-{{@index}}. [ ] {{this.action}}
-{{/each}}
-
----
-
 ## References & Resources
 
 | Type | Reference | Details |
@@ -129,17 +110,6 @@ Based on this content, here's how I can apply these learnings:
     "Key insight 3"
   ],
   "quote": "Optional notable quote from this section"
-}
-```
-
-## Action Item Schema
-
-```json
-{
-  "priority": "P0",
-  "priority_emoji": "🔴",
-  "action": "What to do",
-  "context": "Why this matters"
 }
 ```
 
