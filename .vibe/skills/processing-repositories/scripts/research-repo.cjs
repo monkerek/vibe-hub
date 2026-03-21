@@ -35,8 +35,8 @@ function main() {
     console.log('\n--- Discovery Options ---');
     console.log(`1. Basic: Use 'grep_search' and 'read_file' in ${tempDir}`);
     console.log(`2. Advanced: Run Python analyzer (requires tree-sitter):`);
-    console.log(`   python3 .gemini/skills/codebase-research/scripts/codebase-research.py find "auth" ${tempDir}`);
-    console.log(`\nFollow the optimized workflow in .gemini/skills/codebase-research/skill.md`);
+    console.log(`   python3 .gemini/skills/processing-repositories/scripts/codebase-research.py find "auth" ${tempDir}`);
+    console.log(`\nFollow the optimized workflow in .gemini/skills/processing-repositories/SKILL.md`);
   } catch (err) {
     console.error(`Failed to clone repository: ${err.message}`);
     process.exit(1);

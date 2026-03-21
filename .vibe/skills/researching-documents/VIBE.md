@@ -3,7 +3,7 @@
 This folder contains the `researching-documents` skill and its supporting references and templates.
 
 ## 📂 Structure
-- `researching-documents.md`: Core skill instructions.
+- `SKILL.md`: Core skill instructions.
 - `references/`: Methodology, document types, and reading strategies.
 - `templates/`: Markdown templates for digests.
 

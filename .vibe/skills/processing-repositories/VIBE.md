@@ -3,7 +3,7 @@
 This folder contains the `processing-repositories` skill and its supporting scripts and references.
 
 ## 📂 Structure
-- `processing-repositories.md`: Core skill instructions.
+- `SKILL.md`: Core skill instructions.
 - `scripts/`: Implementation scripts (Node.js, Python).
 - `references/`: Mappings, templates, and setup guides.
 

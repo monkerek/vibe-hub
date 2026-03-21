@@ -2,7 +2,7 @@
 
 This document contains tree-sitter query patterns for extracting code structures across different languages.
 
-**Purpose:** Copy-paste reference for implementing the parsing phase of codebase-research skill.
+**Purpose:** Copy-paste reference for implementing the parsing phase of the `processing-repositories` skill.
 
 ---
 

@@ -9,9 +9,9 @@ Vibe Hub is a multi-agent research workspace designed for Gemini CLI, Claude Cod
 - **Digests**: Structured research stored in `digest/`
 
 ## ⚖️ Core Mandates
-1. **Naming Convention**: ALWAYS use `aaa-bbb.cc` (kebab-case) for all files. No spaces, no underscores.
+1. **Naming Convention**: Default to kebab-case for repository files and directories. Required platform entrypoints keep their mandated names: `VIBE.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and `SKILL.md`.
 2. **Digest Naming**: Research digests MUST follow the pattern `<repo-name>-digest-YYYYMMDD.md`.
-3. **Skill Development**: Use gerund names for skills (e.g., `processing-repositories.md`). Follow `.vibe/skills/skill-authoring/authoring-new-skills.md`.
+3. **Skill Development**: Use gerund, kebab-case directory names for skills (e.g., `processing-repositories/`) with `SKILL.md` as the required entrypoint. Follow `.vibe/skills/authoring-new-skills/SKILL.md`.
 4. **Tool Integrity**: Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize).
 5. **Security**: Never commit secrets or API keys. Protect `.env` files.
 
@@ -28,21 +28,27 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 ## 🤝 Platform Standards & Working Agreements
 
 ### Claude Code (CLAUDE.md)
-- **Build & Test**: `node .vibe/skills/codebase-research/scripts/research-repo.cjs` for skill validation.
+- **Build & Test**: `node .vibe/skills/processing-repositories/scripts/research-repo.cjs` for skill validation.
 - **Git**: Use `git worktree` for isolated development.
 - **Progressive Disclosure**: Modularize large instructions using the `@import` pattern.
 
 ### Codex CLI (AGENTS.md)
 - **Agreements**: Verify all new files with `ls -R` and `grep` for naming compliance.
 - **Expectations**: All repository research MUST result in a standardized architectural digest.
+- **Skills**: Codex skills are directory-based packages with a required `SKILL.md` entrypoint.
+
+### Shared Skills
+- Keep the source of truth in `.vibe/skills/`.
+- Surface that directory through `.codex/skills`, `.claude/skills`, `.gemini/skills`, and `.agents/skills` symlinks so all three CLIs discover the same skill packages.
+- Each skill directory must expose `SKILL.md`, optional `references/`, optional `templates/`, and optional `scripts/`.
 
 ## 🚀 Standard Operating Procedures (SOPs)
 
 ### 1. Researching a Repository
-- Clone using `node .vibe/skills/codebase-research/scripts/research-repo.cjs <url>`.
+- Clone using `node .vibe/skills/processing-repositories/scripts/research-repo.cjs <url>`.
 - Phase 1 (Discovery): Use `semantic-mappings.md` to identify high-signal files.
 - Phase 2 (Prefetch): Perform at least 2 rounds of iterative discovery (import following).
-- Phase 3 (Synthesize): Generate the digest using the template in `processing-repositories.md`.
+- Phase 3 (Synthesize): Generate the digest using the template in `.vibe/skills/processing-repositories/SKILL.md`.
 
 ### 2. Managing Dotfiles
 - Source file: `.config/<tool>/<file>`
@@ -53,7 +59,7 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 - Use `git worktree add .tmp/worktrees/<name> -b <branch>`.
 
 ## 📂 Skill References
-- @.vibe/skills/codebase-research/processing-repositories.md
-- @.vibe/skills/doc-research/researching-documents.md
-- @.vibe/skills/no-gaslighting/debugging-with-wisdom.md
-- @.vibe/skills/skill-authoring/authoring-new-skills.md
+- @.vibe/skills/processing-repositories/SKILL.md
+- @.vibe/skills/researching-documents/SKILL.md
+- @.vibe/skills/debugging-with-wisdom/SKILL.md
+- @.vibe/skills/authoring-new-skills/SKILL.md

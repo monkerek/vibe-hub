@@ -1,4 +1,4 @@
-# No-Gaslighting Context — VIBE.md
+# Debugging with Wisdom Context — VIBE.md
 
 This folder contains the `debugging-with-wisdom` skill.
 

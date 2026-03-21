@@ -326,10 +326,9 @@ poetry add tree-sitter tree-sitter-python tree-sitter-typescript
 
 After successful installation:
 
-1. ✅ Read `skill.md` for usage patterns
+1. ✅ Read `SKILL.md` for usage patterns
 2. ✅ Review `tree-sitter-queries.md` for query examples
-3. ✅ Check `IMPLEMENTATION.md` for development roadmap
-4. ✅ Try example queries with the skill
+3. ✅ Try example queries with the skill
 
 ---
 

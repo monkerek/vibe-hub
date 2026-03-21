@@ -138,5 +138,5 @@ tags: {{tags}}
 </details>
 
 ---
-*Processed: {{date_processed}} | Skill: doc-research | Version: 2.0*
+*Processed: {{date_processed}} | Skill: researching-documents | Version: 2.0*
 ```
