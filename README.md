@@ -8,8 +8,8 @@ A personal project for researching and learning about various codebases, tools, 
   - **`codebase-research/`**: Automates the workflow to research GitHub repositories and generate documentation.
   - **`no-gaslighting/`**: An anti-manipulation skill adapted from `nopua` to drive AI with trust and inner motivation.
 - **`digest/`**: A structured directory containing research digests.
-  - **`skills/`**: Research focused on specialized agent skills and workflows (e.g., [`gstack`](digest/skills/gstack-digest.md)).
-  - **`tools/`**: Research focused on AI-native tools and platforms (e.g., [`nanoclaw`](digest/tools/nanoclaw-digest.md)).
+  - **`skills/`**: Research focused on specialized agent skills and workflows (e.g., [`gstack`](digest/skills/gstack-digest-20260321.md)).
+  - **`tools/`**: Research focused on AI-native tools and platforms (e.g., [`nanoclaw`](digest/tools/nanoclaw-digest-20260321.md)).
   - **`workflow/`**: Research focused on end-to-end development workflows and processes.
 
 ## 🛠 Skills
@@ -34,12 +34,12 @@ Currently available research:
 
 | Project | Category | Summary |
 |---------|----------|---------|
-| [superpowers](digest/workflow/superpowers-digest.md) | Workflow | Composable skills for agentic TDD, brainstorming, and debugging. |
-| [gws](digest/tools/gws-digest.md) | Tool | Dynamic Google Workspace CLI with 40+ agent skills. || [gstack](digest/skills/gstack-digest.md) | Skill | Garry Tan's "software factory" with 15+ specialized agent roles. |
-| [lazygit](digest/tools/lazygit-digest.md) | Tool | Terminal UI for git commands with interactive rebasing and staging. || [nanoclaw](digest/tools/nanoclaw-digest.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
-| [nopua](digest/skills/nopua-digest.md) | Skill | Trust-driven AI prompting inspired by the *Dao De Jing*. |
-| [ghostty](digest/tools/ghostty-digest.md) | Tool | Fast, native, feature-rich terminal emulator written in Zig. |
-| [starship](digest/tools/starship-digest.md) | Tool | Minimal, blazing-fast, and customizable prompt for any shell. |
-
+| [superpowers](digest/workflow/superpowers-digest-20260321.md) | Workflow | Composable skills for agentic TDD, brainstorming, and debugging. |
+| [gws](digest/tools/gws-digest-20260321.md) | Tool | Dynamic Google Workspace CLI with 40+ agent skills. || [gstack](digest/skills/gstack-digest-20260321.md) | Skill | Garry Tan's "software factory" with 15+ specialized agent roles. |
+| [lazygit](digest/tools/lazygit-digest-20260321.md) | Tool | Terminal UI for git commands with interactive rebasing and staging. || [nanoclaw](digest/tools/nanoclaw-digest-20260321.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
+| [nopua](digest/skills/nopua-digest-20260321.md) | Skill | Trust-driven AI prompting inspired by the *Dao De Jing*. |
+| [ghostty](digest/tools/ghostty-digest-20260321.md) | Tool | Fast, native, feature-rich terminal emulator written in Zig. |
+| [starship](digest/tools/starship-digest-20260321.md) | Tool | Minimal, blazing-fast, and customizable prompt for any shell. |
+| [Attention Is All You Need](digest/paper/attention-is-all-you-need-digest-20260321.md) | Paper | The foundational paper on the Transformer architecture. |
 ## ⚖️ License
 MIT
