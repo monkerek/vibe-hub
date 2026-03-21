@@ -1,1 +1,0 @@
-.codexvibe.md
