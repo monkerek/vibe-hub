@@ -4,7 +4,7 @@ This file provides context for the Claude Code agent. It modularizes project-spe
 
 ## 📂 Shared Infrastructure
 - **Skills**: Shared at `.vibe/skills/`.
-- **Context**: Shared at `GEMINI.md` (Workspace-level mandates).
+- **Context**: Shared at `VIBE.md` (Workspace-level mandates).
 
 ## ⚖️ Core Mandates
 - Follow the `aaa-bbb.cc` (kebab-case) naming convention for all files.
@@ -12,7 +12,7 @@ This file provides context for the Claude Code agent. It modularizes project-spe
 - Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize).
 
 ## 🚀 SOPs
-Refer to `GEMINI.md` for detailed SOPs on repository research, dotfile management, and workflow isolation.
+Refer to `VIBE.md` for detailed SOPs on repository research, dotfile management, and workflow isolation.
 
 ## 📂 Skill References
 - @.vibe/skills/codebase-research/processing-repositories.md

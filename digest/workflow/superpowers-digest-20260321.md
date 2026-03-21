@@ -28,13 +28,13 @@ Superpowers is a capability-extension framework for AI agents. It uses a hook-ba
 - `docs/`: Platform-specific installation and usage guides.
 
 ## 🎯 Main Entry Points
-- `GEMINI.md`: The main configuration for Gemini CLI users.
+- `VIBE.md`: The main configuration for Gemini CLI users.
 - `skills/using-superpowers/skill.md`: The system's "onboarding" skill that introduces the agent to the superpower workflow.
 
 ## 📝 Observations & Patterns
 - **Process Over Guessing**: Explicitly forbids agents from "jumping into code" without a validated design and plan.
 - **Hard-Gates**: Uses strong language ("You MUST", "HARD-GATE") to override LLM tendencies toward shortcuts.
-- **Self-Documenting Discovery**: Standardized `skill.md` and `GEMINI.md` discovery protocols that allow agents to autonomously learn and deploy new tools.
+- **Self-Documenting Discovery**: Standardized `skill.md` and `VIBE.md` discovery protocols that allow agents to autonomously learn and deploy new tools.
 - **YAGNI & DRY**: Built-in adherence to core software engineering principles.
 
 ## 🛠 How to Install (Gemini CLI)
