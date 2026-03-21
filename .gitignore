@@ -1,8 +1,3 @@
-# Ignore Gemini CLI temporary files and metadata
-.gemini/*
-# But don't ignore the skills directory
-!.gemini/skills/
-
 # Standard ignores
 node_modules/
 .tmp/
