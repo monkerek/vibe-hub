@@ -34,7 +34,7 @@ Currently available research:
 |---------|----------|---------|
 | [superpowers](digest/workflow/superpowers-digest.md) | Workflow | Composable skills for agentic TDD, brainstorming, and debugging. |
 | [gws](digest/tools/gws-digest.md) | Tool | Dynamic Google Workspace CLI with 40+ agent skills. || [gstack](digest/skills/gstack-digest.md) | Skill | Garry Tan's "software factory" with 15+ specialized agent roles. |
-| [nanoclaw](digest/tools/nanoclaw-digest.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
+| [lazygit](digest/tools/lazygit-digest.md) | Tool | Terminal UI for git commands with interactive rebasing and staging. || [nanoclaw](digest/tools/nanoclaw-digest.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
 | [nopua](digest/skills/nopua-digest.md) | Skill | Trust-driven AI prompting inspired by the *Dao De Jing*. |
 | [ghostty](digest/tools/ghostty-digest.md) | Tool | Fast, native, feature-rich terminal emulator written in Zig. |
 | [starship](digest/tools/starship-digest.md) | Tool | Minimal, blazing-fast, and customizable prompt for any shell. |
