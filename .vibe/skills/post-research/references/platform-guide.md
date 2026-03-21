@@ -4,6 +4,22 @@ Per-platform fetch behavior, known limitations, and URL normalization for the `p
 
 ---
 
+## 🔄 Fetch Fallback Chain
+
+All fetch attempts follow this priority order, mirroring the `web-fetcher` skill:
+
+| Tier | Service | URL Pattern | Notes |
+|---|---|---|---|
+| 1 | **Jina Reader** | `https://r.jina.ai/<url>` | Best Markdown quality; use `Accept: text/markdown` header. Free tier: 100 RPM. |
+| 2 | **defuddle.md** | `https://defuddle.md/<url>` | Good fallback for structured articles; less reliable on SPAs. |
+| 3 | **markdown.new** | `https://markdown.new/<url>` | Last-resort converter; output quality varies. |
+
+Stop at the first tier that returns ≥ 100 characters without auth-wall signals. If all three fail, report all errors and do not proceed — raw HTML is not acceptable input for digest synthesis.
+
+**API key note**: Jina Reader's free tier may rate-limit or return 403 in high-traffic environments. For production use, pass an `Authorization: Bearer <token>` header to increase limits to 500 RPM.
+
+---
+
 ## 🐦 Twitter / X (`x.com`, `twitter.com`)
 
 ### URL Patterns
