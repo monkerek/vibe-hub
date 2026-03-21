@@ -1,1 +1,1 @@
-.agentsvibe.md
+VIBE.md

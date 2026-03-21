@@ -1,1 +1,1 @@
-.claudevibe.md
+VIBE.md

@@ -1,1 +1,1 @@
-.viberc.md
+VIBE.md
