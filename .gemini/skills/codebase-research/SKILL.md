@@ -9,21 +9,36 @@ description: Research a GitHub repository and generate a markdown digest in the 
 
 This skill enables Gemini CLI to systematically research external GitHub repositories and generate a structured "digest" markdown file. These digests are stored in the `digest/skills/` or `digest/tools/` directory of the current project, serving as a reference for future work or learning.
 
-## Workflow
+## Workflow (Optimized)
 
-1.  **Identify Target**: Get the GitHub URL and determine the destination folder (`digest/skills/` or `digest/tools/`).
-2.  **Environment Setup**: Use the `research_repo.cjs` script to clone the repository into a temporary directory and generate an initial file listing.
-3.  **Deep Dive**:
-    -   Read the `README.md` for high-level context.
-    -   Analyze configuration files (`package.json`, `go.mod`, `Cargo.toml`, `requirements.txt`) to identify the tech stack.
-    -   Locate main entry points (e.g., `src/index.ts`, `main.go`, `app.py`).
-    -   Use `grep_search` to find core business logic and architectural patterns.
-4.  **Generate Digest**: Create a markdown file at `<folder>/<repo-name>-digest.md` using the provided template.
-5.  **Cleanup**: Remove the temporary cloned repository.
+### 1. Identify Target
+- Get the GitHub URL and determine the destination folder (`digest/skills/`, `digest/tools/`, or `digest/workflow/`).
+- Use `research_repo.cjs` to clone the repository into a temporary directory.
+
+### 2. Phase 1: Discovery (File Selection)
+- **Query Rewriting**: Transform natural language questions into technical code search keywords using `references/SEMANTIC_MAPPINGS.md`.
+- **Initial Discovery**:
+  - Read `README.md` and configuration files (`package.json`, `go.mod`, etc.).
+  - Locate entry points (e.g., `src/index.ts`, `main.go`, `app.py`).
+  - Use `glob` and `grep_search` (with `names_only: true`) to find files matching rewritten keywords.
+
+### 3. Phase 2: Prefetch (Deep Dive & Iteration)
+- **Iterative Discovery (MAX_ROUNDS Pattern)**:
+  - Round 1: Analyze initial high-signal files found in Phase 1.
+  - Round 2: Parse import statements in those files to discover related files automatically.
+  - Round 3+: Repeat as needed to trace core logic or architectural layers.
+- **Check Context First**: After each round, evaluate if current context is sufficient to answer the query. If YES, stop early.
+
+### 4. Phase 3: Synthesize (Generate Digest)
+- Create a markdown file at `<folder>/<repo-name>-digest.md` using the template below.
+- Focus on architectural patterns, data flow, and key logic discovered during iterative analysis.
+
+### 5. Cleanup
+- Remove the temporary cloned repository.
+
+---
 
 ## Digest Template
-
-The generated digest should follow this structure:
 
 ```markdown
 # [Repository Name] Digest
@@ -61,5 +76,7 @@ The generated digest should follow this structure:
 
 ### scripts/research_repo.cjs
 A utility to clone a repository to a temporary location and provide a summary of its structure.
-
 **Usage**: `node scripts/research_repo.cjs <repo-url>`
+
+### references/SEMANTIC_MAPPINGS.md
+A mapping of conceptual terms to code keywords for better discovery.

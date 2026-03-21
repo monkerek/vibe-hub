@@ -27,12 +27,16 @@ function main() {
     console.log(`Successfully cloned ${repoName}.`);
 
     // List main files to give the agent a quick overview
-    console.log('\n--- Project Structure ---');
-    const tree = execSync(`find ${tempDir} -maxdepth 2 -not -path '*/.*'`, { encoding: 'utf8' });
+    console.log('\n--- Project Structure (Top Level) ---');
+    const tree = execSync(`ls -R ${tempDir} | head -n 50`, { encoding: 'utf8' });
     console.log(tree.split('\n').map(line => line.replace(tempDir, '.')).join('\n'));
 
     console.log(`\nTemp directory: ${tempDir}`);
-    console.log('Use this path for further research.');
+    console.log('\n--- Discovery Options ---');
+    console.log(`1. Basic: Use 'grep_search' and 'read_file' in ${tempDir}`);
+    console.log(`2. Advanced: Run Python analyzer (requires tree-sitter):`);
+    console.log(`   python3 .gemini/skills/codebase-research/scripts/codebase_research.py find "auth" ${tempDir}`);
+    console.log(`\nFollow the optimized workflow in .gemini/skills/codebase-research/SKILL.md`);
   } catch (err) {
     console.error(`Failed to clone repository: ${err.message}`);
     process.exit(1);
