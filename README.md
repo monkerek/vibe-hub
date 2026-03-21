@@ -1,6 +1,11 @@
-# Vibe Hub
-
 <img width="1024" height="578" alt="image" src="https://github.com/user-attachments/assets/eba8f09d-d594-4ca2-94ff-8df7b8128fb0" />
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Gemini_CLI-8E75B2?style=flat-square&logo=googlegemini&logoColor=white" alt="Gemini CLI">
+  <img src="https://img.shields.io/badge/Claude_Code-black?style=flat-square&logo=anthropic&logoColor=white" alt="Claude Code">
+  <img src="https://img.shields.io/badge/Codex_CLI-412991?style=flat-square&logo=openai&logoColor=white" alt="Codex CLI">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
+</p>
 
 A personal project for researching and learning about various codebases, tools, and agentic workflows. This repository is optimized for multi-agent collaboration, supporting Gemini CLI, Claude Code, and Codex CLI with a unified, cross-platform infrastructure.
 
