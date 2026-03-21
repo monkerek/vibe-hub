@@ -39,9 +39,10 @@ The shared context follows the platform context-file guidance above:
 
 Shared skills live in `.vibe/skills/` and are surfaced to all agents through `.codex/skills`, `.claude/skills`, `.gemini/skills`, and the Gemini-compatible `.agents/skills` alias.
 
-The packaging follows the documented skill format for Claude Code and Gemini CLI:
+The packaging follows the documented skill format for Claude Code, Gemini CLI, and Codex CLI:
 - Claude Code skills: <https://code.claude.com/docs/en/skills>
 - Gemini CLI skills: <https://geminicli.com/docs/cli/skills/>
+- Codex CLI skills: <https://developers.openai.com/codex/skills>
 
 Each skill is a directory with a required `SKILL.md` entrypoint and optional `references/`, `templates/`, and `scripts/` folders.
 
