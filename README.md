@@ -45,10 +45,10 @@ The packaging follows the documented skill format for Claude Code and Gemini CLI
 
 Each skill is a directory with a required `SKILL.md` entrypoint and optional `references/`, `templates/`, and `scripts/` folders.
 
-- **`processing-repositories`**: Iterative repository analysis and architectural mapping.
-- **`researching-documents`**: Systematic evaluation of academic papers and technical articles.
-- **`debugging-with-wisdom`**: Trust-driven debugging and root cause analysis.
-- **`authoring-new-skills`**: Enforces project-specific standards for all new skills.
+- **`repo-research`**: Iterative repository analysis and architectural mapping.
+- **`doc-research`**: Systematic evaluation of academic papers and technical articles.
+- **`gaslighting`**: Trust-driven debugging and root cause analysis.
+- **`skill-author`**: Enforces project-specific standards for all new skills.
 
 ## 🚀 Research Digests
 

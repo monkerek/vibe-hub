@@ -11,7 +11,7 @@ Vibe Hub is a multi-agent research workspace designed for Gemini CLI, Claude Cod
 ## ⚖️ Core Mandates
 1. **Naming Convention**: Default to kebab-case for repository files and directories. Required platform entrypoints keep their mandated names: `VIBE.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and `SKILL.md`.
 2. **Digest Naming**: Research digests MUST follow the pattern `<repo-name>-digest-YYYYMMDD.md`.
-3. **Skill Development**: Use gerund, kebab-case directory names for skills (e.g., `processing-repositories/`) with `SKILL.md` as the required entrypoint. Follow `.vibe/skills/authoring-new-skills/SKILL.md`.
+3. **Skill Development**: Use concise, kebab-case directory names for skills (e.g., `repo-research/`) with `SKILL.md` as the required entrypoint. Follow `.vibe/skills/skill-author/SKILL.md`.
 4. **Tool Integrity**: Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize).
 5. **Security**: Never commit secrets or API keys. Protect `.env` files.
 
@@ -28,7 +28,7 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 ## 🤝 Platform Standards & Working Agreements
 
 ### Claude Code (CLAUDE.md)
-- **Build & Test**: `node .vibe/skills/processing-repositories/scripts/research-repo.cjs` for skill validation.
+- **Build & Test**: `node .vibe/skills/repo-research/scripts/research-repo.cjs` for skill validation.
 - **Git**: Use `git worktree` for isolated development.
 - **Progressive Disclosure**: Modularize large instructions using the `@import` pattern.
 
@@ -45,10 +45,10 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 ## 🚀 Standard Operating Procedures (SOPs)
 
 ### 1. Researching a Repository
-- Clone using `node .vibe/skills/processing-repositories/scripts/research-repo.cjs <url>`.
+- Clone using `node .vibe/skills/repo-research/scripts/research-repo.cjs <url>`.
 - Phase 1 (Discovery): Use `semantic-mappings.md` to identify high-signal files.
 - Phase 2 (Prefetch): Perform at least 2 rounds of iterative discovery (import following).
-- Phase 3 (Synthesize): Generate the digest using the template in `.vibe/skills/processing-repositories/SKILL.md`.
+- Phase 3 (Synthesize): Generate the digest using the template in `.vibe/skills/repo-research/SKILL.md`.
 
 ### 2. Managing Dotfiles
 - Source file: `.config/<tool>/<file>`
@@ -59,7 +59,7 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 - Use `git worktree add .tmp/worktrees/<name> -b <branch>`.
 
 ## 📂 Skill References
-- @.vibe/skills/processing-repositories/SKILL.md
-- @.vibe/skills/researching-documents/SKILL.md
-- @.vibe/skills/debugging-with-wisdom/SKILL.md
-- @.vibe/skills/authoring-new-skills/SKILL.md
+- @.vibe/skills/repo-research/SKILL.md
+- @.vibe/skills/doc-research/SKILL.md
+- @.vibe/skills/gaslighting/SKILL.md
+- @.vibe/skills/skill-author/SKILL.md
