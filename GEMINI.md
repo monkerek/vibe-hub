@@ -4,22 +4,22 @@ Vibe Hub is a research-oriented workspace designed to analyze external codebases
 
 ## 🛠 Tech Stack
 - **AI Tooling**: Gemini CLI, Claude Code
-- **Skills**: Custom skills in `.gemini/skills/`
+- **Skills**: Custom skills in `.vibe/skills/`
 - **Config**: Dotfiles in `.config/` (Ghostty, Starship)
 - **Digests**: Structured research in `digest/`
 
 ## ⚖️ Core Mandates
 1. **Naming Convention**: ALWAYS use `aaa-bbb.cc` (kebab-case) for all files. No spaces, no underscores.
 2. **Digest Naming**: Research digests MUST follow the pattern `<repo-name>-digest-YYYYMMDD.md`.
-3. **Skill Development**: Use gerund names for skills (e.g., `processing-repositories.md`). Follow `.gemini/skills/skill-authoring/authoring-new-skills.md`.
+3. **Skill Development**: Use gerund names for skills (e.g., `processing-repositories.md`). Follow `.vibe/skills/skill-authoring/authoring-new-skills.md`.
 4. **Tool Integrity**: Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize) for all repository analysis.
 5. **Security**: Never commit secrets or API keys. Protect `.env` files.
 
 ## 🚀 Standard Operating Procedures (SOPs)
 
 ### 1. Researching a Repository
-- Clone using `node .gemini/skills/codebase-research/scripts/research-repo.cjs <url>`.
-- Phase 1 (Discovery): Use `.gemini/skills/codebase-research/references/semantic-mappings.md` to identify high-signal files.
+- Clone using `node .vibe/skills/codebase-research/scripts/research-repo.cjs <url>`.
+- Phase 1 (Discovery): Use `.vibe/skills/codebase-research/references/semantic-mappings.md` to identify high-signal files.
 - Phase 2 (Prefetch): Perform at least 2 rounds of iterative discovery (import following).
 - Phase 3 (Synthesize): Generate the digest using the template in `processing-repositories.md`.
 
@@ -33,6 +33,6 @@ Vibe Hub is a research-oriented workspace designed to analyze external codebases
 - Branch pattern: `gemini-agent-work-YYYY-MM-DD`.
 
 ## 📂 Skill References
-- @.gemini/skills/codebase-research/processing-repositories.md
-- @.gemini/skills/no-gaslighting/debugging-with-wisdom.md
-- @.gemini/skills/skill-authoring/authoring-new-skills.md
+- @.vibe/skills/codebase-research/processing-repositories.md
+- @.vibe/skills/no-gaslighting/debugging-with-wisdom.md
+- @.vibe/skills/skill-authoring/authoring-new-skills.md

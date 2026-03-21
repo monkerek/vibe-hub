@@ -4,7 +4,7 @@ A personal project for researching and learning about various codebases, tools, 
 
 ## 📂 Project Structure
 
-- **`.gemini/skills/`**: Custom Gemini CLI skills for this project.
+- **`.vibe/skills/`**: Custom Gemini CLI skills for this project.
   - **`codebase-research/`**: Automates the workflow to research GitHub repositories and generate documentation.
   - **`no-gaslighting/`**: An anti-manipulation skill adapted from `nopua` to drive AI with trust and inner motivation.
 - **`digest/`**: A structured directory containing research digests.
