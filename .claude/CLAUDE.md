@@ -1,1 +1,1 @@
-../CLAUDE.md
+../.claudevibe.md

@@ -1,1 +1,1 @@
-../AGENT.md
+../.codexvibe.md
