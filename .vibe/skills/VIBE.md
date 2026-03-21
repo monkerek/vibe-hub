@@ -8,7 +8,10 @@ This directory contains the project's agentic intelligence. All skills here MUST
     - Include a third-person `description` in YAML frontmatter.
     - Include a `## 🚀 Workflow Checklist`.
     - Use `<HARD-GATE>` for critical validation steps.
-3. **Compatibility**: Every skill folder MUST be accompanied by platform-specific symlinks if it contains its own context.
+3. **Compatibility**: Every context file (`VIBE.md`) MUST be accompanied by platform-specific symlinks in hidden directories:
+    - **`.gemini/GEMINI.md`** -> `VIBE.md`
+    - **`.claude/CLAUDE.md`** -> `VIBE.md`
+    - **`.codex/AGENTS.md`** -> `VIBE.md`
 
 ## 🛡️ Best Practices
 Refer to `.vibe/skills/skill-authoring/authoring-new-skills.md` for the mandatory creation workflow. Follow the [Claude agent skills best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices).

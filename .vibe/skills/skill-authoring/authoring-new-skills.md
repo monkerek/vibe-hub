@@ -23,7 +23,12 @@ You MUST follow this checklist when creating a new skill:
     - [ ] Use **Hard-Gates** (`<HARD-GATE>`) for fragile or critical steps.
     - [ ] Include an `## Anti-Patterns` section to prevent common mistakes.
 4. [ ] **Progressive Disclosure**: Keep the main file under 500 lines. Move large lists (mappings, templates) to a `references/` sub-folder.
-5. [ ] **Validation**: Include a verification step to ensure the skill works as intended.
+5. [ ] **Cross-Agent Compatibility**: Every skill folder MUST include:
+    - [ ] `VIBE.md`: Local context for the skill.
+    - [ ] `.gemini/GEMINI.md` -> `../VIBE.md`
+    - [ ] `.claude/CLAUDE.md` -> `../VIBE.md`
+    - [ ] `.codex/AGENTS.md` -> `../VIBE.md`
+6. [ ] **Validation**: Include a verification step to ensure the skill works as intended.
 
 ---
 

@@ -19,9 +19,9 @@ Vibe Hub is a multi-agent research workspace designed for Gemini CLI, Claude Cod
 
 To ensure perfectly consistent behavior across all AI agents, any context file (`VIBE.md`) MUST be accompanied by platform-specific symlinks:
 
-- **`GEMINI.md`** -> `VIBE.md` (Gemini CLI)
-- **`CLAUDE.md`** -> `VIBE.md` (Claude Code)
-- **`AGENTS.md`** -> `VIBE.md` (Codex CLI)
+- **`.gemini/GEMINI.md`** -> `VIBE.md` (Gemini CLI)
+- **`.claude/CLAUDE.md`** -> `VIBE.md` (Claude Code)
+- **`.codex/AGENTS.md`** -> `VIBE.md` (Codex CLI)
 
 When modifying `VIBE.md`, ensure the instructions are compliant with all three standards (e.g., including build/test commands for Claude and working agreements for Codex).
 
