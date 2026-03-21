@@ -10,6 +10,7 @@ A personal project for researching and learning about various codebases, tools, 
 - **`digest/`**: A structured directory containing research digests.
   - **`skills/`**: Research focused on specialized agent skills and workflows (e.g., [`gstack`](digest/skills/gstack-digest.md)).
   - **`tools/`**: Research focused on AI-native tools and platforms (e.g., [`nanoclaw`](digest/tools/nanoclaw-digest.md)).
+  - **`workflow/`**: Research focused on end-to-end development workflows and processes.
 
 ## 🛠 Skills
 
@@ -31,6 +32,7 @@ Currently available research:
 
 | Project | Category | Summary |
 |---------|----------|---------|
+| [superpowers](digest/workflow/superpowers.md) | Workflow | Composable skills for agentic TDD, brainstorming, and debugging. |
 | [gstack](digest/skills/gstack-digest.md) | Skill | Garry Tan's "software factory" with 15+ specialized agent roles. |
 | [nanoclaw](digest/tools/nanoclaw-digest.md) | Tool | Lightweight, secure Claude assistant running in isolated containers. |
 | [nopua](digest/skills/nopua-digest.md) | Skill | Trust-driven AI prompting inspired by the *Dao De Jing*. |
