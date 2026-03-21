@@ -28,9 +28,14 @@ Stop at the first tier that returns ≥ 100 characters without auth-wall signals
 - Short link: `https://t.co/<id>` — normalize by following the redirect first
 
 ### Fetch Behavior
-- **Jina Reader works** for public tweets: `r.jina.ai/https://x.com/<user>/status/<id>`
-- Jina extracts tweet text, author handle, and sometimes reply counts
-- Auth-wall signal: response contains `"Sign in to X"` or `"Log in"` — treat as failure
+
+Attempt in this order for Twitter/X URLs:
+
+1. **Jina Reader**: `r.jina.ai/https://x.com/<user>/status/<id>` — extracts tweet text, author handle, sometimes reply counts
+2. **twitter-thread.com**: `https://twitter-thread.com/t/<tweet-id>` — public reader that renders full threads without auth; construct from the status ID in the original URL
+3. **defuddle.md** / **markdown.new** — generic fallbacks (see global fallback chain above)
+
+Auth-wall signal: response contains `"Sign in to X"` or `"Log in"` — treat as failure
 
 ### Threads
 - Threads are not a single URL. Each tweet in a thread has its own `/status/<id>`.

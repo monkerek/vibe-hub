@@ -24,9 +24,10 @@ You MUST follow this checklist for every post research task:
 1. [ ] **Identify & Triage**: Confirm the URL and detect the platform (Twitter/X, Red Note, or blog). See `references/platform-guide.md` for per-platform quirks.
 2. [ ] **Fetch Content**: Attempt each source in order, stopping at the first success. Log the response length at each step.
    - **Tier 1 — Jina Reader**: `r.jina.ai/<url>` with header `Accept: text/markdown`
-   - **Tier 2 — defuddle.md**: `defuddle.md/<url>` (fallback if Jina fails or returns < 100 chars)
-   - **Tier 3 — markdown.new**: `markdown.new/<url>` (fallback if defuddle also fails)
-   - If all three fail, report all errors and stop — do NOT attempt raw HTML as the digest would be unusable.
+   - **Tier 2 — twitter-thread.com** *(Twitter/X only)*: `https://twitter-thread.com/t/<tweet-id>` (public thread reader; extract the tweet ID from the original URL)
+   - **Tier 3 — defuddle.md**: `defuddle.md/<url>` (fallback if prior tiers fail or return < 100 chars)
+   - **Tier 4 — markdown.new**: `markdown.new/<url>` (last resort)
+   - If all tiers fail, report all errors and stop — do NOT attempt raw HTML as the digest would be unusable.
 3. [ ] **Auth Wall Check**: Scan the fetched content for auth-wall signals (`sign in`, `log in`, `create account`, `verify you are human`). If detected, stop and report the failure — do NOT proceed with partial content.
 4. [ ] **Detect Language**: Identify the primary language of the content (en, zh, etc.) and note it in the digest metadata.
 5. [ ] **Detect Content Shape**: Distinguish between a single post (short), a thread (sequential), or a long-form article, as this affects how the digest is structured.
