@@ -34,5 +34,6 @@ Vibe Hub is a research-oriented workspace designed to analyze external codebases
 
 ## 📂 Skill References
 - @.vibe/skills/codebase-research/processing-repositories.md
+- @.vibe/skills/doc-research/researching-documents.md
 - @.vibe/skills/no-gaslighting/debugging-with-wisdom.md
 - @.vibe/skills/skill-authoring/authoring-new-skills.md
