@@ -1,5 +1,7 @@
 # Vibe Hub
 
+<img width="1024" height="578" alt="image" src="https://github.com/user-attachments/assets/eba8f09d-d594-4ca2-94ff-8df7b8128fb0" />
+
 A personal project for researching and learning about various codebases, tools, and agentic workflows. This repository is optimized for multi-agent collaboration, supporting Gemini CLI, Claude Code, and Codex CLI with a unified, cross-platform infrastructure.
 
 ## 📂 Project Structure
