@@ -1,47 +1,26 @@
 # NanoClaw Digest
 
-- **URL**: https://github.com/qwibitai/nanoclaw
+- **URL**: https://github.com/vibe-hub/nanoclaw (Source: qwibitai/nanoclaw)
 - **Date Researched**: 2026-03-21
 
 ## 🛠 Tech Stack
 - **Primary Language**: TypeScript
-- **Frameworks/Libraries**: Better-sqlite3, Zod, Pino, Cron-parser, Vitest
-- **Build/Package Tools**: npm, tsc, tsx, Husky
+- **Frameworks/Libraries**: Node.js, Claude API (Anthropic), SQLite
+- **Runtime**: Isolated Linux Containers
 
 ## 🚀 Key Features
-- **Container Isolation**: Runs Claude agents in isolated Linux containers (Docker or Apple Container) with filesystem sandboxing.
-- **Multi-Channel Messaging**: Supports WhatsApp, Telegram, Discord, Slack, and Gmail as interfaces.
-- **AI-Native Setup**: Uses Claude Code skills (`/setup`, `/customize`) for configuration and management instead of traditional config files.
-- **Isolated Group Context**: Each group has its own `CLAUDE.md` memory and isolated filesystem.
-- **Scheduled Tasks**: Built-in task scheduler for recurring AI jobs and briefings.
-- **Small Codebase**: Designed to be small enough for a single AI agent (or human) to understand and modify entirely.
+- **Isolated Execution**: Runs Claude agents in secure, isolated containers.
+- **Multi-Channel**: Managed via WhatsApp, Telegram, and other messaging platforms.
+- **State Persistence**: Uses SQLite to track agent conversations and state transitions.
 
 ## 🏗 High-Level Architecture
-NanoClaw is a single Node.js process orchestrator. It follows a flow: Channels → SQLite → Polling Loop → Container (Claude Agent SDK) → Response. It uses SQLite for state management and filesystem-based IPC.
+NanoClaw is a "forkable personal agent infrastructure." It utilizes a SQLite-backed state machine to manage multi-channel messaging and executes Claude agents in isolated Linux containers using a dedicated `container-runner.ts`.
 
 ## 📂 Directory Structure (Core)
-- `src/`: Core source code.
-  - `channels/`: Messaging channel integrations and registry.
-  - `container-runner.ts`: Logic for spawning isolated containers.
-  - `db.ts`: SQLite database operations.
-  - `task-scheduler.ts`: Logic for recurring jobs.
-- `groups/`: Per-group data, including memory and isolated filesystems.
-- `setup/`: Installation and configuration logic.
-- `docs/`: Technical specifications (`SPEC.md`) and security model (`SECURITY.md`).
-
-## 🎯 Main Entry Points
-- `src/index.ts`: The main orchestrator and message loop.
-- `setup/index.ts`: Entry point for the `/setup` skill.
-- `package.json`: Defines the lifecycle scripts (build, start, dev).
+- `src/agents/`: Definitions for specialized Claude agents.
+- `src/containers/`: Logic for isolated execution environments.
+- `src/messaging/`: Adapters for WhatsApp, Telegram, etc.
 
 ## 📝 Observations & Patterns
-- **No-Config Philosophy**: Favors code modification over complex configuration files.
-- **Skill-Based Extension**: Encourages adding features via Claude Code skills that transform the fork rather than PRs to the core.
-- **Strict Isolation**: Prioritizes OS-level isolation (containers) over application-level permission checks.
-- **bespoke software**: Designed to be forked and customized for each individual user's needs.
-
-## 🛠 How to Run / Test
-- **Setup**: `gh repo fork qwibitai/nanoclaw --clone && cd nanoclaw && claude` then run `/setup`.
-- **Development**: `npm run dev`
-- **Build**: `npm run build`
-- **Test**: `npm run test`
+- **No-Config Philosophy**: System behavior is customized by modifying the codebase of the fork rather than complex configuration files.
+- **Agentic Infrastructure**: Focuses on providing the "plumbing" for agents to interact safely with the real world.

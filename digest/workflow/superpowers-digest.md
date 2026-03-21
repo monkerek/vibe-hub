@@ -16,11 +16,11 @@
 - **Git Worktrees**: Automatically manages isolated workspaces for parallel development branches.
 
 ## 🏗 High-Level Architecture
-Superpowers is a collection of composable "skills" designed to wrap LLM-based coding agents in a structured engineering process. It functions as a declarative workflow engine where each skill (defined in `SKILL.md`) uses "Hard-Gates" to enforce high-quality engineering standards (Design -> Plan -> Test -> Implement).
+Superpowers is a capability-extension framework for AI agents. It uses a hook-based system to intercept agent lifecycle events and inject specialized commands (brainstorm, execute-plan). It functions as a declarative workflow engine where each skill (defined in `skill.md`) uses "Hard-Gates" to enforce high-quality engineering standards (Design -> Plan -> Test -> Implement).
 
 ## 📂 Directory Structure (Core)
 - `agents/`: Specialized agent roles (e.g., `code-reviewer.md`).
-- `skills/`: The core logic library, where each folder contains a `SKILL.md` with detailed instructions and process flows.
+- `skills/`: The core logic library, where each folder contains a `skill.md` with detailed instructions and process flows.
   - `brainstorming/`: Design refinement.
   - `test-driven-development/`: Implementation cycle.
   - `writing-plans/`: Task decomposition.
@@ -29,12 +29,12 @@ Superpowers is a collection of composable "skills" designed to wrap LLM-based co
 
 ## 🎯 Main Entry Points
 - `GEMINI.md`: The main configuration for Gemini CLI users.
-- `skills/using-superpowers/SKILL.md`: The system's "onboarding" skill that introduces the agent to the superpower workflow.
+- `skills/using-superpowers/skill.md`: The system's "onboarding" skill that introduces the agent to the superpower workflow.
 
 ## 📝 Observations & Patterns
 - **Process Over Guessing**: Explicitly forbids agents from "jumping into code" without a validated design and plan.
 - **Hard-Gates**: Uses strong language ("You MUST", "HARD-GATE") to override LLM tendencies toward shortcuts.
-- **Self-Documenting**: Uses Mermaid/Dot diagrams and checklists within skill definitions to make the workflow transparent to the agent.
+- **Self-Documenting Discovery**: Standardized `skill.md` and `GEMINI.md` discovery protocols that allow agents to autonomously learn and deploy new tools.
 - **YAGNI & DRY**: Built-in adherence to core software engineering principles.
 
 ## 🛠 How to Install (Gemini CLI)
