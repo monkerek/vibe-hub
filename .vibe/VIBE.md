@@ -1,6 +1,6 @@
 # Vibe Hub Context — VIBE.md
 
-Vibe Hub is a research-oriented workspace designed to analyze external codebases and generate structured Markdown digests. It is a multi-agent environment supporting Gemini CLI, Claude Code, and Codex CLI.
+Vibe Hub is a multi-agent research workspace designed for Gemini CLI, Claude Code, and Codex CLI. This directory (`.vibe/`) serves as the core "Source of Truth" for agentic intelligence, context, and shared mandates.
 
 ## 🛠 Tech Stack
 - **AI Tooling**: Gemini CLI, Claude Code, Codex CLI
@@ -15,16 +15,26 @@ Vibe Hub is a research-oriented workspace designed to analyze external codebases
 4. **Tool Integrity**: Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize).
 5. **Security**: Never commit secrets or API keys. Protect `.env` files.
 
-## 🤝 Working Agreements & Standards
+## 🛡️ Cross-Agent Compatibility Policy
+
+To ensure perfectly consistent behavior across all AI agents, any context file (`VIBE.md`) MUST be accompanied by platform-specific symlinks:
+
+- **`GEMINI.md`** -> `VIBE.md` (Gemini CLI)
+- **`CLAUDE.md`** -> `VIBE.md` (Claude Code)
+- **`AGENTS.md`** -> `VIBE.md` (Codex CLI)
+
+When modifying `VIBE.md`, ensure the instructions are compliant with all three standards (e.g., including build/test commands for Claude and working agreements for Codex).
+
+## 🤝 Platform Standards & Working Agreements
 
 ### Claude Code (CLAUDE.md)
 - **Build & Test**: `node .vibe/skills/codebase-research/scripts/research-repo.cjs` for skill validation.
-- **Git**: Use `git worktree` for isolation.
-- **Standards**: Modularize large instructions using the `@import` pattern.
+- **Git**: Use `git worktree` for isolated development.
+- **Progressive Disclosure**: Modularize large instructions using the `@import` pattern.
 
 ### Codex CLI (AGENTS.md)
 - **Agreements**: Verify all new files with `ls -R` and `grep` for naming compliance.
-- **Expectations**: All repository research MUST result in a standardized digest.
+- **Expectations**: All repository research MUST result in a standardized architectural digest.
 
 ## 🚀 Standard Operating Procedures (SOPs)
 

@@ -1,1 +1,1 @@
-../VIBE.md
+../.vibe/VIBE.md
