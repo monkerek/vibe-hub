@@ -51,31 +51,49 @@ To get the absolute path automatically:
 echo "node $(pwd)/dist/index.js"
 ```
 
-### 4. Install the config
+### 4. Install the slash commands
 
-Create the config directory and copy the example config in one step:
+Copy the setup and configure commands to Claude Code's global commands directory so they are available as `/claude-menu:setup` and `/claude-menu:configure`:
+
+```bash
+mkdir -p ~/.claude/commands/claude-menu && cp commands/setup.md commands/configure.md ~/.claude/commands/claude-menu/
+```
+
+> **Run this from inside the `claude-menu` directory** (where you ran `npm install`).
+
+### 5. Install the config
+
+Create the config directory and copy the example config:
 
 ```bash
 mkdir -p ~/.claude/plugins/claude-menu && cp config.example.toml ~/.claude/plugins/claude-menu/config.toml
 ```
 
-### 5. Restart Claude Code
+### 6. Restart Claude Code
 
 The statusline is rendered each time Claude Code refreshes the UI. Restart the CLI (or reload the window if using the IDE extension) to see your new statusline.
 
 ---
 
-## Using the built-in setup command
+## Using the built-in slash commands
 
-If you have the plugin registered, you can run the interactive setup from inside Claude Code:
+Once the commands are installed (step 4), you can use them from inside any Claude Code session:
+
+### `/claude-menu:setup`
+
+Runs an interactive setup that:
+1. Finds your `dist/index.js` automatically
+2. Writes the `statusLine` entry to `~/.claude/settings.json`
+3. Creates a starter `~/.claude/plugins/claude-menu/config.toml`
+4. Smoke-tests the render and shows you the output
 
 ```
 /claude-menu:setup
 ```
 
-This command will automatically find the correct path, write `~/.claude/settings.json`, and create a starter config file.
+### `/claude-menu:configure`
 
-To customise interactively after setup:
+Walks you through every config option — theme, layout, segments, and mottos — shows a preview before saving, then renders a live preview:
 
 ```
 /claude-menu:configure
