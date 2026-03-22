@@ -10,6 +10,7 @@
 [theme]
 name = "pastel-rainbow"
 separator = ""            # Powerline arrow. Try "" for thin, "│" for pipe
+rounded = true            # Rounded caps on each bar (requires Nerd Font)
 
 # Override individual segment colors (optional):
 # [theme.segments.motto]

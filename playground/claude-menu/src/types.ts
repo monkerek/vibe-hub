@@ -106,6 +106,7 @@ export interface SegmentStyle {
 export interface ThemeConfig {
   name: BuiltinTheme | string;
   separator?: string;
+  rounded?: boolean;
   segments?: Record<string, Partial<SegmentStyle>>;
 }
 
