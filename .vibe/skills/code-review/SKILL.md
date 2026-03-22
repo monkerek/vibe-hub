@@ -1,7 +1,6 @@
 ---
 name: code-review
 description: Performs a structured multi-agent code review of a pull request or local diff. TRIGGER when: user asks to review a PR, review a pull request, run a code review, review my changes, review before merging, check my diff. DO NOT TRIGGER when: user asks to write code, create a PR, explain what a PR does, or summarize changes without reviewing them.
-compatibility: claude-code
 ---
 
 # Code Review

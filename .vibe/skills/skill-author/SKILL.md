@@ -67,7 +67,6 @@ Save trigger/no-trigger examples AND observed failure modes — you will need bo
 8. [ ] **Frontmatter** — required fields:
    - [ ] `name`: kebab-case identifier matching the directory name (max 64 chars).
    - [ ] `description`: Third-person. Include `TRIGGER when:` and `DO NOT TRIGGER when:` clauses. Max 1024 chars.
-   - [ ] `compatibility` *(optional)*: restrict to specific platforms (e.g., `claude-code`).
 9. [ ] **Required sections** (in this order):
    - [ ] `## Overview` — what the skill does and why it exists.
    - [ ] `## ✍️ Writing Principles` *(if skill involves authoring)* or equivalent guidance.
@@ -148,7 +147,6 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden plat
 ---
 name: kebab-case-identifier
 description: Third-person summary. TRIGGER when: <prompts that should invoke this skill>. DO NOT TRIGGER when: <prompts that must not invoke this skill>.
-compatibility: claude-code  # optional; omit to support all platforms
 ---
 
 # Skill Title
