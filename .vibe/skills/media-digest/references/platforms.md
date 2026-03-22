@@ -70,6 +70,23 @@ data = transcript.fetch()
 - Manual captions: Depends on creator
 - Auto-generated: English, Spanish, Portuguese, German, French, Italian, Dutch, Russian, Japanese, Korean, Chinese (Simplified)
 
+### Sandbox / Network-Restricted Fallback
+
+When running inside an Anthropic sandbox (or any environment where `youtube.com` is blocked by a JWT egress proxy):
+
+1. **Detect the block early**: `yt-dlp --dump-json URL` will fail with `Tunnel connection failed: 403 Forbidden`. Do not retry — it will always fail.
+2. **Skip Invidious and Piped**: Only ~3 public Invidious instances exist as of 2026 (`inv.nadeko.net`, `yewtu.be`, `invidious.nerdvpn.de`). All block cloud-provider IPs. WebFetch will 403. Skip them.
+3. **GitHub API search** (most reliable fallback):
+   ```bash
+   curl -s "https://api.github.com/search/issues?q=VIDEO_ID" \
+     -H "Accept: application/vnd.github+json"
+   ```
+   Translation PRs (Korean, Chinese, Japanese YouTube archival communities) frequently contain full English chapter outlines and timestamped breakdowns in their PR descriptions.
+4. **WebSearch** for `"VIDEO_ID"` and `"[title] transcript"`: Returns usable snippets from podscripts.co and similar aggregators, even when WebFetch to those domains returns 403.
+5. **YouTube Data API** (`googleapis.com` is allowlist-accessible): Can fetch video metadata (title, description, chapters) with `YOUTUBE_API_KEY`. Does **not** provide transcripts.
+
+See `references/transcription-guide.md` → *Network-Restricted Environments* for the full fallback cascade and code examples.
+
 ---
 
 ## Bilibili (哔哩哔哩)

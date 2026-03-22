@@ -39,6 +39,41 @@ brew install whisper-cpp
 
 ## <instructions>
 
+### 0. Network Environment Detection (Run First)
+Before making any network calls, probe whether the session is running behind a restrictive egress proxy:
+
+```bash
+# Check for JWT proxy (common in Anthropic sandbox)
+python3 -c "import os; p=os.environ.get('GLOBAL_AGENT_HTTP_PROXY',''); print('JWT proxy' if 'jwt' in p.lower() else ('proxy: '+p[:60] if p else 'no proxy'))"
+```
+
+If a JWT proxy is detected, decode it and check whether `youtube.com` is in the allowed-hosts claim. If YouTube is **absent from the allowlist**, skip Steps 1–2 for YouTube entirely — `yt-dlp`, `youtube-transcript-api`, and `WebFetch` to YouTube/Invidious will always fail. Proceed directly to the **Secondary Source Fallback** below.
+
+#### Secondary Source Fallback Cascade (Network-Restricted Environments)
+
+Execute in order, stop when you have enough content to write the digest:
+
+1. **WebSearch** — Search for the video ID directly (e.g. `kwSVtQ7dziU`). Snippets often reveal the title, guest, and key themes.
+2. **GitHub API** — Search issues, PRs, and code for the video ID. Translation projects and archival repos frequently contain full timestamped chapter breakdowns.
+   ```bash
+   VIDEO_ID="VIDEO_ID_HERE"
+   curl -s "https://api.github.com/search/issues?q=${VIDEO_ID}" \
+     -H "Accept: application/vnd.github+json" | \
+     python3 -c "
+   import json,sys
+   d=json.load(sys.stdin)
+   for i in d.get('items',[]):
+       print(i['title'], '\n', i['html_url'])
+       print((i.get('body') or '')[:800])
+       print('---')
+   "
+   ```
+3. **WebSearch for transcript aggregators** — Once the title is known, search `"[title]" transcript site:podscripts.co` or `"[title]" full transcript`. Use the snippets returned; direct WebFetch may still 403 from bot-detection.
+4. **WebSearch for secondary summaries** — Newsletter writeups, blog posts, fan notes, and LinkedIn posts often carry substantial content.
+5. **Knowledge synthesis** — Combine retrieved metadata + known speaker context. Document all secondary sources in the digest footer.
+
+> **Note**: `api.github.com` and WebSearch are always accessible in Anthropic sandboxes. Invidious and Piped instances block cloud IPs — skip them.
+
 ### 1. Platform Detection & Metadata
 - Identify the source platform from the URL (YouTube, Bilibili, 小宇宙FM, Apple Podcasts, etc.).
 - Use `yt-dlp --dump-json` or platform-specific APIs to fetch metadata (title, author, duration, publish date).
@@ -65,15 +100,18 @@ brew install whisper-cpp
 - **No Action Items**: Focus strictly on synthesis and analysis of the content itself.
 - **Token Efficiency**: Use parallel tool calls for metadata fetching and speaker research.
 - **Privacy**: Delete any temporary audio files or extracted frames after the digest is generated.
+- **Source Transparency**: When using secondary sources (GitHub, web summaries) instead of a direct transcript, document all sources in the digest footer under a "Sources" section.
 </constraints>
 
 ## <workflow_checklist>
+- [ ] **Step 0**: Detect network environment; if YouTube-blocked, use Secondary Source Fallback.
 - [ ] Detect platform and fetch metadata.
 - [ ] Research speaker/author background.
-- [ ] Extract transcript or frames (based on duration).
+- [ ] Extract transcript or frames (based on duration); use fallback cascade if blocked.
 - [ ] Segment content and identify key insights.
 - [ ] Format output using `templates/default.md`.
 - [ ] Verify accuracy and naming conventions.
+- [ ] If fallback sources used, add "Sources" footer to digest.
 </workflow_checklist>
 
 ## Resources

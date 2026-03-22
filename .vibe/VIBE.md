@@ -39,7 +39,7 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 
 ### Shared Skills
 - Keep the source of truth in `.vibe/skills/`.
-- Surface that directory through `.codex/skills`, `.claude/skills`, `.gemini/skills`, and `.agents/skills` symlinks so all three CLIs discover the same skill packages.
+- Surface that directory through `.codex/skills`, `.claude/skills`, and `.gemini/skills` symlinks so all three CLIs discover the same skill packages.
 - Each skill directory must expose `SKILL.md`, optional `references/`, optional `templates/`, and optional `scripts/`.
 
 ## 🚀 Standard Operating Procedures (SOPs)
