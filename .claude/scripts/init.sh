@@ -63,11 +63,20 @@ install_homebrew() {
   fi
 
   log "Installing Homebrew..."
-  if NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" >> "$LOG_FILE" 2>&1; then
+  local installer
+  installer="$(mktemp)" || { log "WARNING: mktemp failed — skipping Homebrew."; return 1; }
+  if ! curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh -o "$installer" 2>>"$LOG_FILE"; then
+    log "WARNING: Failed to download Homebrew installer — continuing without it."
+    rm -f "$installer"
+    return 1
+  fi
+  if NONINTERACTIVE=1 /bin/bash "$installer" >> "$LOG_FILE" 2>&1; then
+    rm -f "$installer"
     # Add brew to PATH for the rest of this session
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
     log "brew installed successfully ($(brew --version | head -1))."
   else
+    rm -f "$installer"
     log "WARNING: Homebrew installation failed — continuing without it."
   fi
 }
