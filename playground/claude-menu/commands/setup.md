@@ -4,10 +4,29 @@ Set up Claude Menu as your Claude Code statusline.
 
 ## Instructions
 
-This command configures Claude Code to use Claude Menu as the statusline provider.
+Follow these steps exactly. Use bash tools to execute each command.
 
-1. First, find the absolute path to the claude-menu `dist/index.js` file.
-2. Update `~/.claude/settings.json` to add or replace the `statusLine` field with:
+### Step 1: Find the dist/index.js path
+
+Run this search to locate the claude-menu installation:
+
+```bash
+find "$HOME" -maxdepth 6 -name "index.js" -path "*/claude-menu/dist/index.js" 2>/dev/null | head -5
+```
+
+If the search returns results, confirm the correct path with the user (there may be multiple clones). If nothing is found, ask the user to provide the absolute path to their `claude-menu/dist/index.js`.
+
+Once you have the path, verify it exists:
+
+```bash
+test -f "/absolute/path/to/claude-menu/dist/index.js" && echo "EXISTS" || echo "MISSING — run: npm run build"
+```
+
+If the file is MISSING, instruct the user to run `npm run build` inside the claude-menu directory first, then re-run this command.
+
+### Step 2: Write the statusLine to ~/.claude/settings.json
+
+Read `~/.claude/settings.json` (create it as `{}` if it doesn't exist), then add or replace the `statusLine` field:
 
 ```json
 {
@@ -15,32 +34,32 @@ This command configures Claude Code to use Claude Menu as the statusline provide
 }
 ```
 
-Use the actual resolved path. You can determine it by running:
+Preserve all other existing fields. Write the updated JSON back to `~/.claude/settings.json`. Validate it is well-formed JSON after writing.
+
+### Step 3: Install the config (if not already present)
+
+Check whether `~/.claude/plugins/claude-menu/config.toml` already exists:
+
 ```bash
-echo "node $(cd "$(dirname "$(which claude-menu 2>/dev/null || echo "$PWD/dist/index.js")")" && pwd)/index.js"
+test -f "$HOME/.claude/plugins/claude-menu/config.toml" && echo "EXISTS" || echo "MISSING"
 ```
 
-Or if claude-menu was installed locally, resolve from the project root:
+If MISSING, create the directory and write a starter config:
+
 ```bash
-node -e "const p=require('path'); console.log('node ' + p.resolve(__dirname, 'dist/index.js'))"
+mkdir -p "$HOME/.claude/plugins/claude-menu"
 ```
 
-3. After writing the settings, inform the user they need to restart Claude Code for the statusline to take effect.
-
-4. Verify the setup by checking that:
-   - `dist/index.js` exists (run `npm run build` if not)
-   - `~/.claude/settings.json` is valid JSON after modification
-   - The `statusLine` path points to an actual file
-
-5. Create the default config directory and a starter `config.toml` at `~/.claude/plugins/claude-menu/config.toml` if it doesn't exist:
+Then write `~/.claude/plugins/claude-menu/config.toml` with this content:
 
 ```toml
 # Claude Menu Configuration
-# Docs: https://github.com/anthropics/claude-menu
+# Run /claude-menu:configure to customise themes, mottos, and segments.
 
 [theme]
 name = "pastel-rainbow"
 separator = ""
+rounded = true
 
 [layout]
 mode = "expanded"
@@ -53,4 +72,20 @@ pack = "motivational-en"
 emoji = true
 ```
 
-Tell the user: "Claude Menu is set up! Restart Claude Code to see your new statusline. Run `/claude-menu:configure` to customize themes, mottos, and segments."
+### Step 4: Smoke-test the statusline
+
+Run a quick render to confirm the binary works (substitute the real path):
+
+```bash
+echo '{"model":{"display_name":"claude-sonnet-4-6"},"context_window":{"used_percentage":34,"context_window_size":200000},"cwd":"/home/user/my-project"}' \
+  | node /absolute/path/to/claude-menu/dist/index.js
+```
+
+Show the output to the user. If it prints colored powerline segments the setup is working. If it prints nothing or errors, report the error.
+
+### Step 5: Confirm
+
+Tell the user:
+
+> **Claude Menu is set up!** Restart Claude Code to see your new statusline.
+> Run `/claude-menu:configure` to customize themes, layout, and mottos.
