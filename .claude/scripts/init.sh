@@ -57,14 +57,35 @@ install_gh() {
   fi
 }
 
+install_homebrew() {
+  if command_exists brew; then
+    log "brew is already installed ($(brew --version | head -1))."
+    return 0
+  fi
+
+  log "Installing Homebrew..."
+  if NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" >> "$LOG_FILE" 2>&1; then
+    # Add brew to PATH for the rest of this session
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv bash)"
+    log "brew installed successfully ($(brew --version | head -1))."
+  else
+    log "WARNING: Homebrew installation failed — continuing without it."
+  fi
+}
+
 install_gws() {
   if command_exists gws; then
     log "gws is already installed ($(gws --version 2>/dev/null || echo 'unknown version'))."
     return 0
   fi
 
-  log "Installing gws (Google Workspace CLI)..."
-  if npm install -g @googleworkspace/cli --loglevel=error >> "$LOG_FILE" 2>&1; then
+  if ! command_exists brew; then
+    log "WARNING: gws requires Homebrew but brew is not available — skipping."
+    return 0
+  fi
+
+  log "Installing gws (Google Workspace CLI) via Homebrew..."
+  if brew install googleworkspace-cli >> "$LOG_FILE" 2>&1; then
     log "gws installed successfully ($(gws --version 2>/dev/null || echo 'installed'))."
   else
     log "WARNING: gws installation failed — continuing without it."
@@ -73,12 +94,13 @@ install_gws() {
 
 # ---------------------------------------------------------------------------
 # Main — run all installs in a single background subshell so the session
-# is never blocked.  Uses `set +e` so one failing tool doesn't abort the rest.
+# is never blocked.  Individual failures are logged and do not abort the rest.
 # ---------------------------------------------------------------------------
 main() {
   log "=== Starting dependency installation ($(date -Iseconds)) ==="
 
   install_gh
+  install_homebrew
   install_gws
 
   log "=== Dependency installation complete ($(date -Iseconds)) ==="
