@@ -1,14 +1,15 @@
-import { readFile } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { createInterface } from 'node:readline';
 export async function parseTranscript(path) {
-    // Track each tool invocation by its tool_use id
     const invocations = new Map();
-    // Track agent launches by their tool_use id
     const agents = new Map();
     const todos = [];
     try {
-        const raw = await readFile(path, 'utf-8');
-        const lines = raw.trim().split('\n');
-        for (const line of lines) {
+        const rl = createInterface({
+            input: createReadStream(path, { encoding: 'utf-8' }),
+            crlfDelay: Infinity,
+        });
+        for await (const line of rl) {
             if (!line.trim())
                 continue;
             try {
@@ -50,9 +51,8 @@ export async function parseTranscript(path) {
         todos,
     };
 }
-// Real Claude Code transcript format: each line is a JSON object whose
-// tool/agent/todo events live inside entry.message.content[] as content blocks.
-// entry.type is "assistant" | "user" | "system" etc. — NOT "tool_use".
+// entry.type is the message role ("assistant"|"user"), not a content-block type;
+// tool_use blocks live inside entry.message.content[].
 function processLine(entry, invocations, agents, todos) {
     const message = entry.message;
     if (!message)

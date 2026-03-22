@@ -134,7 +134,7 @@ function renderTodos(ctx) {
     return text;
 }
 function renderEnvironment(_ctx) {
-    // This will be populated by environment data if available
+    // TODO: implement environment data rendering
     return undefined;
 }
 function renderTime(_ctx) {
