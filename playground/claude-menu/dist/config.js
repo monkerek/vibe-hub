@@ -127,10 +127,40 @@ function parseToml(text) {
         const kvMatch = line.match(/^(\w[\w.-]*)\s*=\s*(.+)$/);
         if (kvMatch) {
             const [, key, rawValue] = kvMatch;
-            currentSection[key] = parseTomlValue(rawValue.trim());
+            currentSection[key] = parseTomlValue(extractTomlValue(rawValue.trim()));
         }
     }
     return result;
+}
+// Strip inline comments and extract the raw value token.
+// TOML allows: key = "value"  # inline comment
+function extractTomlValue(raw) {
+    // Double-quoted string: scan for closing quote, respecting backslash escapes
+    if (raw.startsWith('"')) {
+        let i = 1;
+        while (i < raw.length) {
+            if (raw[i] === '\\') {
+                i += 2;
+                continue;
+            }
+            if (raw[i] === '"')
+                return raw.slice(0, i + 1);
+            i++;
+        }
+        return raw;
+    }
+    // Single-quoted string: no escape sequences in TOML literal strings
+    if (raw.startsWith("'")) {
+        const close = raw.indexOf("'", 1);
+        return close !== -1 ? raw.slice(0, close + 1) : raw;
+    }
+    // Inline array: take everything up to and including the last ]
+    if (raw.startsWith('[')) {
+        const close = raw.lastIndexOf(']');
+        return close !== -1 ? raw.slice(0, close + 1) : raw;
+    }
+    // Bare value (boolean, number, unquoted string): stop at whitespace or #
+    return raw.split(/[\s#]/)[0] ?? raw;
 }
 function parseTomlValue(raw) {
     // String (double or single quoted)
