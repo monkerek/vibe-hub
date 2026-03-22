@@ -9,6 +9,8 @@
 
 A personal project for researching and learning about various codebases, tools, and agentic workflows. This repository is optimized for multi-agent collaboration, supporting Gemini CLI, Claude Code, and Codex CLI with a unified, cross-platform infrastructure.
 
+It is fully compatible with **Gemini CLI**, supporting both project context files (`.gemini/GEMINI.md`) and agent skills (`.gemini/skills/`) seamlessly linked to the central source of truth in `.vibe/`.
+
 ## 📂 Project Structure
 
 - **`.vibe/`**: The core "Source of Truth" for agentic intelligence and context.
@@ -30,7 +32,7 @@ All agent platforms reference the same central source of truth via platform-spec
 | **Codex CLI** | `.codex/AGENTS.md` | `.vibe/VIBE.md` | [Codex Agents](https://developers.openai.com/codex/guides/agents-md) |
 
 The shared context follows the platform context-file guidance above:
-- Gemini CLI treats `GEMINI.md` as project context and documents workspace discovery rules in its Gemini MD guide.
+- **Gemini CLI** treats `GEMINI.md` as project context and discovers agent skills through `.gemini/skills/`. See the [Gemini MD guide](https://geminicli.com/docs/cli/gemini-md/) and [Gemini CLI Skills guide](https://geminicli.com/docs/cli/skills/).
 - Claude Code uses `CLAUDE.md` for persistent project instructions and documents loading behavior in its memory guide.
 - Codex CLI uses `AGENTS.md` for workspace-specific instructions.
 
