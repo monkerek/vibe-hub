@@ -15,7 +15,6 @@ A personal project for researching and learning about various codebases, tools, 
   - **`VIBE.md`**: Centralized project context, mandates, and SOPs.
   - **`skills/`**: Standardized agent skills.
 - **`.gemini/`, `.claude/`, `.codex/`**: Platform-specific entry points symlinked to `.vibe/`.
-- **`.agents/`**: Shared Gemini-compatible alias for workspace skills.
 - **`digest/`**: A structured directory containing research digests (categorized by type).
 - **`.config/`**: Managed system configurations (dotfiles) for Ghostty, Starship, etc.
 
@@ -44,7 +43,7 @@ The shared context follows the platform context-file guidance above:
 
 ## 🛠 Skills
 
-Shared skills live in `.vibe/skills/` and are surfaced to all agents through `.codex/skills`, `.claude/skills`, `.gemini/skills`, and the Gemini-compatible `.agents/skills` alias.
+Shared skills live in `.vibe/skills/` and are surfaced to all agents through `.codex/skills`, `.claude/skills`, and `.gemini/skills`.
 
 The packaging follows the documented skill format for Claude Code, Gemini CLI, and Codex CLI:
 - Claude Code skills: <https://code.claude.com/docs/en/skills>
