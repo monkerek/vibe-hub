@@ -1,0 +1,12 @@
+[
+  {"query": "I want to refactor the authentication system to be more scalable", "should_trigger": true},
+  {"query": "Build me a dashboard for monitoring our microservices", "should_trigger": true},
+  {"query": "I need a new feature but I'm not sure exactly what it should look like", "should_trigger": true},
+  {"query": "Help me redesign the API layer", "should_trigger": true},
+  {"query": "Interview me about what I want before you start", "should_trigger": true},
+  {"query": "Fix the typo on line 42 of main.py", "should_trigger": false},
+  {"query": "Run the test suite and show me results", "should_trigger": false},
+  {"query": "Add a docstring to the calculate_total function", "should_trigger": false},
+  {"query": "Just do it, don't ask me questions", "should_trigger": false},
+  {"query": "Change the button color from blue to red in styles.css", "should_trigger": false}
+]
