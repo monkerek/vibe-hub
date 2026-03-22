@@ -84,19 +84,14 @@ Every skill MUST be discoverable by all three agents. Run these commands from th
 ```bash
 SKILL_DIR=".vibe/skills/<name>"
 
-# Platform symlinks inside the skill directory
-mkdir -p "$SKILL_DIR/.claude" "$SKILL_DIR/.codex" "$SKILL_DIR/.gemini"
-ln -sf ../SKILL.md "$SKILL_DIR/.claude/CLAUDE.md"
-ln -sf ../SKILL.md "$SKILL_DIR/.codex/AGENTS.md"
-ln -sf ../SKILL.md "$SKILL_DIR/.gemini/GEMINI.md"
-
 # Surface to each CLI's skill discovery path
+mkdir -p .claude/skills .codex/skills .gemini/skills
 ln -sf ../../.vibe/skills/<name> .claude/skills/<name>
 ln -sf ../../.vibe/skills/<name> .codex/skills/<name>
 ln -sf ../../.vibe/skills/<name> .gemini/skills/<name>
 ```
 
-Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden platform dirs.
+Verify: `ls -la .claude/skills/<name>/` must show SKILL.md.
 </HARD-GATE>
 
 11. [ ] Symlinks created and verified.
@@ -135,7 +130,7 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden plat
 | Source of truth | `.vibe/skills/<name>/SKILL.md` |
 | Entrypoint | `SKILL.md` |
 | Description format | Third-person + `TRIGGER when` / `DO NOT TRIGGER when`, ≤ 1024 chars |
-| Cross-agent wiring | All three platform symlinks required |
+| Cross-agent wiring | Skill directory must be symlinked into `.claude/skills/`, `.codex/skills/`, and `.gemini/skills/` |
 | File size | < 500 lines per file |
 | Scope | One skill = one responsibility; split if checklist > 15 steps |
 
@@ -181,7 +176,7 @@ DO NOT proceed until this condition is satisfied.
 - **Vague description**: "Does research" will not trigger reliably. Write `TRIGGER when:` / `DO NOT TRIGGER when:` with specific, realistic example prompts in mind.
 - **Over-specifying the workflow**: Listing every micro-step makes skills brittle. Apply the lean prompt principle — trust the model, specify the checkpoints.
 - **Missing the why**: `"Verify symlinks"` is weaker than `"Verify symlinks exist (cross-agent discoverability breaks without them)"`. Always explain the reason.
-- **Skipping cross-agent wiring**: A skill without platform symlinks is invisible to Gemini CLI and Codex. Always run Phase 3.
+- **Skipping cross-agent wiring**: A skill that hasn't been symlinked into `.claude/skills/`, `.codex/skills/`, and `.gemini/skills/` is invisible to some platforms. Always run Phase 3.
 - **Editing `.claude/skills/<name>/SKILL.md` directly**: Always edit the source at `.vibe/skills/<name>/SKILL.md`. CLI-specific directories should only contain symlinks.
 - **Monolithic SKILL.md**: Files over 500 lines slow context loading. Extract large references to `references/`.
 - **Missing HARD-GATEs**: Steps that write files, run destructive commands, or depend on external state MUST be gated.
