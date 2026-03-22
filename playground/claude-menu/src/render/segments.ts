@@ -161,7 +161,7 @@ function renderTodos(ctx: RenderContext): string | undefined {
 }
 
 function renderEnvironment(_ctx: RenderContext): string | undefined {
-  // This will be populated by environment data if available
+  // TODO: implement environment data rendering
   return undefined;
 }
 
