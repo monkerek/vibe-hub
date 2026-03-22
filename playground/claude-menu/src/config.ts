@@ -252,7 +252,7 @@ export async function loadConfig(): Promise<ClaudeMenuConfig> {
     const parsed = parseToml(raw) as Record<string, unknown>;
     return mergeConfig(DEFAULT_CONFIG, parsed);
   } catch {
-    return { ...DEFAULT_CONFIG };
+    return structuredClone(DEFAULT_CONFIG);
   }
 }
 

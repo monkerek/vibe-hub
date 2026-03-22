@@ -31,8 +31,12 @@ function renderPowerlineSegment(
     out += reset() + fgColor(style.bg) + ROUND_RIGHT + reset();
   } else if (nextBg) {
     out += bgColor(nextBg) + fgColor(style.bg) + separator;
-  } else {
+  } else if (!isLast) {
+    // Non-rounded, no following segment bg known — emit separator only when not last
+    // to avoid a dangling separator (e.g. trailing │) after the final segment.
     out += reset() + fgColor(style.bg) + separator + reset();
+  } else {
+    out += reset();
   }
 
   return out;
@@ -84,6 +88,9 @@ function renderExpanded(segments: RenderedSegment[], separator: string, rounded:
 // ─── ANSI-aware truncation ──────────────────────────────────────────────────
 
 // Split a string into alternating ANSI-escape and visible-text tokens.
+// NOTE: Only SGR sequences (ending in 'm') are matched. Non-SGR ANSI codes
+// (cursor movement, etc.) in custom motto strings are unsupported and will
+// be counted toward visible width, causing incorrect truncation.
 const ANSI_RE = /\x1b\[[0-9;]*m/g;
 
 function truncateAnsi(str: string, maxWidth: number): string {

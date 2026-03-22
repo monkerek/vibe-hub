@@ -248,7 +248,7 @@ export async function loadConfig() {
         return mergeConfig(DEFAULT_CONFIG, parsed);
     }
     catch {
-        return { ...DEFAULT_CONFIG };
+        return structuredClone(DEFAULT_CONFIG);
     }
 }
 function mergeConfig(defaults, overrides) {

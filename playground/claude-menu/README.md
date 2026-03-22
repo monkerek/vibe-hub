@@ -243,7 +243,7 @@ emoji = true
 
 | Strategy | Behaviour |
 |---|---|
-| `day-of-week` | Cycles through the motto list by weekday (Mon=0, …, Sun=6), or uses an explicit day mapping |
+| `day-of-week` | Cycles through the motto list by weekday (Sun=0, Mon=1, …, Sat=6), or uses an explicit day-name mapping (`monday`, `tuesday`, …) |
 | `random` | Picks a random motto each render |
 | `sequential` | Advances by day-of-year — deterministic but ever-changing |
 | `time-of-day` | Selects based on morning / afternoon / evening / night |

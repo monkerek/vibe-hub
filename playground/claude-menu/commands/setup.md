@@ -92,7 +92,7 @@ rounded = true
 
 [layout]
 mode = "expanded"
-segments = ["motto", "project", "git", "model", "context", "time"]
+segments = ["motto", "project", "git", "model", "context", "time", "tools", "agents", "todos"]
 
 [motto]
 enabled = true
