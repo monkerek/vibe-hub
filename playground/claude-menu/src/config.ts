@@ -99,6 +99,7 @@ export const DEFAULT_CONFIG: ClaudeMenuConfig = {
   theme: {
     name: 'pastel-rainbow',
     separator: '',
+    rounded: true,
   },
   layout: {
     mode: 'expanded',

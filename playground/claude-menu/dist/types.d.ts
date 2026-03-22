@@ -73,6 +73,7 @@ export interface SegmentStyle {
 export interface ThemeConfig {
     name: BuiltinTheme | string;
     separator?: string;
+    rounded?: boolean;
     segments?: Record<string, Partial<SegmentStyle>>;
 }
 export type SegmentName = 'motto' | 'model' | 'project' | 'git' | 'context' | 'usage' | 'tools' | 'agents' | 'todos' | 'environment' | 'time';

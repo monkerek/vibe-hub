@@ -87,6 +87,7 @@ export const DEFAULT_CONFIG = {
     theme: {
         name: 'pastel-rainbow',
         separator: '',
+        rounded: true,
     },
     layout: {
         mode: 'expanded',
