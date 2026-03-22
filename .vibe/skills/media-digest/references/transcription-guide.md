@@ -17,6 +17,73 @@ Detailed guide for extracting audio and generating transcripts from various plat
 
 ---
 
+## Network-Restricted Environments (Sandbox / CI)
+
+When running inside a sandboxed environment (e.g., Anthropic's Claude Code web sessions), the egress traffic is filtered by a JWT proxy that enforces a per-request allowed-hosts list. YouTube, Invidious, and most media CDNs are **not** in that list, so all direct-access methods silently fail with `Tunnel connection failed: 403 Forbidden`.
+
+### 403 Error Taxonomy
+
+Understanding the error type determines the correct response:
+
+| Error Pattern | Symptom | Root Cause | Correct Action |
+|---|---|---|---|
+| `Tunnel connection failed: 403` | yt-dlp / urllib / WebFetch fails before any content is received | Host blocked by JWT egress proxy | Skip entirely; use Secondary Source Fallback |
+| HTTP 403 from target | WebFetch returns 403 *with* a response body (HTML) | Target server rejects cloud-provider IPs (bot-detection) | Try different source; snippets from WebSearch still work |
+| `[Errno -3] Temporary failure in name resolution` | DNS lookup fails | Fully isolated network; proxy-only | All direct TCP connections fail; only proxy-allowed hosts work |
+
+### Always-Accessible in Anthropic Sandboxes
+
+| Host | Accessible | Notes |
+|---|---|---|
+| `api.github.com` | ✅ | Issues, PRs, code search — all endpoints |
+| `github.com` | ✅ | Web pages and raw content |
+| `raw.githubusercontent.com` | ✅ | Raw file content |
+| `*.googleapis.com` | ✅ | YouTube Data API *metadata only* (requires `YOUTUBE_API_KEY`) |
+| WebSearch tool | ✅ | Uses Anthropic infrastructure; bypasses system proxy |
+| `youtube.com` / `youtu.be` | ❌ | Proxy-blocked |
+| Invidious instances (inv.nadeko.net, yewtu.be, etc.) | ❌ | Only 3 public instances exist as of 2026; all block cloud IPs |
+| Piped API | ❌ | Same cloud-IP blocking as Invidious |
+| `podscripts.co`, most transcript aggregators | ⚠️ | WebFetch 403 (bot-detection), but WebSearch **snippets** are usable |
+
+### GitHub API Search — Best YouTube Fallback
+
+Translation projects, archival repos, and fan communities regularly post full timestamped chapter breakdowns in GitHub issues and PRs. Searching by video ID reliably surfaces these:
+
+```bash
+VIDEO_ID="kwSVtQ7dziU"
+
+# Search issues and PRs
+curl -s "https://api.github.com/search/issues?q=${VIDEO_ID}&sort=relevance&per_page=5" \
+  -H "Accept: application/vnd.github+json" | \
+  python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+for i in d.get('items', []):
+    print('TITLE:', i['title'])
+    print('URL:  ', i['html_url'])
+    print('BODY:\n', (i.get('body') or '')[:1000])
+    print('---')
+"
+
+# Also check PR file diffs (often contain chapter content inline)
+# GET https://api.github.com/repos/{owner}/{repo}/pulls/{number}/files
+```
+
+**Why this works**: Korean, Chinese, and Japanese YouTube archival communities maintain GitHub repos where they translate popular tech/science episodes. These translation PRs often include the full English chapter outline or transcript in the PR description or diff.
+
+### Recommended Fallback Order (YouTube, Sandbox)
+
+```
+1. WebSearch "VIDEO_ID"                    → get title + snippets
+2. api.github.com/search/issues?q=VIDEO_ID → full chapter content
+3. WebSearch "[title] transcript"          → snippet extracts from aggregators
+4. WebSearch "[title] summary"             → blog posts, newsletters
+5. YouTube Data API (metadata only)        → if YOUTUBE_API_KEY is set
+6. Synthesize from retrieved context       → document all sources in digest footer
+```
+
+---
+
 ## Method 1: Platform-Native Transcripts
 
 ### YouTube (Best Support)
