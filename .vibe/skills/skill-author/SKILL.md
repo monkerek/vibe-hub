@@ -24,11 +24,14 @@ Write each layer for its audience: the metadata must win the trigger battle; the
 
 Apply these when authoring any section of a SKILL.md:
 
-- **Principle of Lack of Surprise**: the skill must do exactly what its name implies — nothing more, nothing less. A user who reads the name should be able to predict the output.
-- **Keep prompts lean**: don't over-specify every micro-step. Trust the model. Over-specification creates brittleness and makes skills harder to maintain.
+- **Principle of Lack of Surprise**: the skill MUST do exactly what its name implies — nothing more, nothing less. A user who reads the name should be able to predict the output.
+- **Keep prompts lean**: don't over-specify every micro-step. Trust the model. Over-specification creates brittleness and makes skills harder to maintain. Target < 150 words for the body of frequently-loaded skills.
 - **Explain the why**: tell the agent *why* it should do something, not just *what*. `"Verify symlinks exist (cross-agent discoverability breaks without them)"` beats `"Verify symlinks exist"`.
 - **Generalize from feedback**: when a test case fails, fix the root principle, not just the specific case. Ask "what class of mistake does this represent?"
 - **Repeated work is a signal**: if multiple test cases need the same setup step, that step belongs in the skill, not the prompt.
+- **Use compliance language for critical steps**: write `MUST` and `NEVER` for non-negotiable requirements, not `should` or `consider`. Imperative framing (Authority) + explicit acknowledgment requirements (Commitment) + citing established norms (Social Proof) together double agent compliance rates. Reserve soft language for genuine suggestions.
+- **Anticipate rationalizations**: agents under pressure will find excuses to skip steps. HARD-GATEs should name the specific rationalization they block — `"DO NOT skip this even if the task seems time-sensitive"` outperforms `"Complete this step"`.
+- **No time-sensitive content**: never embed dates, version numbers, or external URLs that will stale. Put evergreen principles in SKILL.md; reference volatile data via scripts or external tools.
 
 ---
 
@@ -36,7 +39,7 @@ Apply these when authoring any section of a SKILL.md:
 
 Follow every phase in order. Do NOT skip or reorder steps.
 
-### Phase 0 — Capture Intent
+### Phase 0 — Capture Intent (RED Phase)
 
 Before writing a single line, answer these four questions (ask the user if unclear):
 
@@ -45,7 +48,13 @@ Before writing a single line, answer these four questions (ask the user if uncle
 3. [ ] When should it NOT trigger? (draft 3–5 example prompts that must NOT trigger it)
 4. [ ] What does a successful output look like?
 
-Save trigger/no-trigger examples — you will need them in Phase 4.
+<HARD-GATE>
+Run the target task WITHOUT the skill first. Document exactly where the agent fails or cuts corners.
+If you skip this step, you cannot know whether the skill you write prevents the right failures.
+A skill written without observing real failure modes addresses imagined problems, not actual ones.
+</HARD-GATE>
+
+Save trigger/no-trigger examples AND observed failure modes — you will need both in Phase 4.
 
 ### Phase 1 — Scaffold
 
@@ -105,14 +114,17 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden plat
 ```
 
 13. [ ] **Self-test**: Invoke the skill with one should-trigger prompt. Confirm output follows the checklist.
-14. [ ] **Lint** — verify SKILL.md has:
+14. [ ] **Pressure test** — re-run the self-test under combined pressure (add "this is urgent", "we already did X", "just skip that step this time"). The skill MUST hold. If the agent rationalizes past a HARD-GATE under pressure, add an explicit counter to that HARD-GATE.
+15. [ ] **Lint** — verify SKILL.md has:
     - [ ] YAML frontmatter with `name` (≤ 64 chars) and `description` (≤ 1024 chars)
     - [ ] `TRIGGER when:` and `DO NOT TRIGGER when:` in the description
     - [ ] All required sections present
-    - [ ] At least one `<HARD-GATE>` if the skill has destructive or external-state-dependent steps
+    - [ ] Critical steps use `MUST`/`NEVER`, not `should`/`consider`
+    - [ ] At least one `<HARD-GATE>` if the skill has destructive or external-state-dependent steps; gate text names the rationalization it blocks
     - [ ] At least one Anti-Pattern entry
-15. [ ] **Commit**: `git add .vibe/skills/<name>/ && git commit -m "feat(skills): add <name> skill"`
-16. [ ] **Package** *(optional)*: `python -m scripts.package_skill .vibe/skills/<name>` to produce a distributable `.skill` ZIP.
+    - [ ] No time-sensitive content (dates, version numbers, external URLs in body text)
+16. [ ] **Commit**: `git add .vibe/skills/<name>/ && git commit -m "feat(skills): add <name> skill"`
+17. [ ] **Package** *(optional)*: `python -m scripts.package_skill .vibe/skills/<name>` to produce a distributable `.skill` ZIP.
 
 ---
 
@@ -177,6 +189,10 @@ DO NOT proceed until this condition is satisfied.
 - **Missing HARD-GATEs**: Steps that write files, run destructive commands, or depend on external state MUST be gated.
 - **Over-scoped skill**: If the workflow checklist exceeds 15 steps, split into sub-skills with focused responsibilities.
 - **Skipping trigger evals**: Without `evals/trigger-eval.json`, you have no way to know if the description is causing false positives or missed triggers.
+- **Soft compliance language**: Writing `"you should verify symlinks"` instead of `"MUST verify symlinks"` reduces compliance under pressure. Use imperative language for all non-optional steps.
+- **HARD-GATEs without rationalization counters**: A gate that just says "complete this step" will be rationalized away. Name the specific excuse it blocks: `"DO NOT skip this even if the previous step seemed to cover it"`.
+- **Testing only under ideal conditions**: If the skill hasn't been tested with urgency, sunk-cost, or authority pressure, it hasn't been fully tested. Real agents skip steps when pressured — the skill must hold.
+- **Time-sensitive content**: Embedding dates, version numbers, or ephemeral URLs in SKILL.md creates maintenance debt. Put evergreen principles in the body; access volatile data through scripts or tools.
 
 ---
 
@@ -194,4 +210,7 @@ DO NOT proceed until this condition is satisfied.
 
 ## 📂 Resources
 - [Built-in skill-creator](/skills activate skill-creator) — foundational principles, eval tooling, description optimization
+- [Anthropic skills best practices](references/anthropic-best-practices.md) — official Anthropic guidance on skill structure, token efficiency, progressive disclosure
+- [Compliance & persuasion principles](references/persuasion-principles.md) — evidence-based language patterns (Authority, Commitment, Social Proof)
+- [TDD for skills](references/testing-skills-with-subagents.md) — RED/GREEN/REFACTOR methodology for skill testing
 - [VIBE.md cross-agent policy](../../VIBE.md)
