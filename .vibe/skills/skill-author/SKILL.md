@@ -11,30 +11,62 @@ This meta-skill governs the creation of new Vibe Hub skills. It enforces local p
 
 **Source of truth**: `.vibe/skills/<name>/` → symlinked into `.claude/skills/`, `.codex/skills/`, `.gemini/skills/`.
 
+**Progressive disclosure model** — skills have three layers:
+1. **Metadata** (`name` + `description` in frontmatter) — injected into the system prompt; what triggers the skill.
+2. **SKILL.md body** — full instructions loaded when the skill activates.
+3. **Bundled resources** (`references/`, `scripts/`, `assets/`) — accessed on demand via `@import` or tool calls.
+
+Write each layer for its audience: the metadata must win the trigger battle; the body must guide execution; resources handle overflow.
+
+---
+
+## ✍️ Writing Principles
+
+Apply these when authoring any section of a SKILL.md:
+
+- **Principle of Lack of Surprise**: the skill must do exactly what its name implies — nothing more, nothing less. A user who reads the name should be able to predict the output.
+- **Keep prompts lean**: don't over-specify every micro-step. Trust the model. Over-specification creates brittleness and makes skills harder to maintain.
+- **Explain the why**: tell the agent *why* it should do something, not just *what*. `"Verify symlinks exist (cross-agent discoverability breaks without them)"` beats `"Verify symlinks exist"`.
+- **Generalize from feedback**: when a test case fails, fix the root principle, not just the specific case. Ask "what class of mistake does this represent?"
+- **Repeated work is a signal**: if multiple test cases need the same setup step, that step belongs in the skill, not the prompt.
+
 ---
 
 ## 🚀 Creation Checklist
 
 Follow every phase in order. Do NOT skip or reorder steps.
 
+### Phase 0 — Capture Intent
+
+Before writing a single line, answer these four questions (ask the user if unclear):
+
+1. [ ] What should this skill enable Claude to do?
+2. [ ] When should this skill trigger? (draft 3–5 example prompts that SHOULD trigger it)
+3. [ ] When should it NOT trigger? (draft 3–5 example prompts that must NOT trigger it)
+4. [ ] What does a successful output look like?
+
+Save trigger/no-trigger examples — you will need them in Phase 4.
+
 ### Phase 1 — Scaffold
 
-1. [ ] **Name**: Choose a concise kebab-case identifier (e.g., `repo-research`). Maximum 3 words.
-2. [ ] **Directory**: Create `.vibe/skills/<name>/` as the source of truth.
-3. [ ] **SKILL.md**: Create `.vibe/skills/<name>/SKILL.md` using the template below.
+5. [ ] **Name**: Choose a concise kebab-case identifier (e.g., `repo-research`). Max 3 words, max 64 chars, pattern `^[a-z0-9][a-z0-9-]*[a-z0-9]$`.
+6. [ ] **Directory**: Create `.vibe/skills/<name>/` as the source of truth.
+7. [ ] **SKILL.md**: Create `.vibe/skills/<name>/SKILL.md` using the template below.
 
 ### Phase 2 — Author
 
-4. [ ] **Frontmatter** — include both fields:
-   - [ ] `name`: kebab-case identifier matching the directory name.
-   - [ ] `description`: Third-person. Include `TRIGGER when:` and `DO NOT TRIGGER when:` clauses so Claude selects this skill automatically.
-5. [ ] **Required sections** (in this order):
+8. [ ] **Frontmatter** — required fields:
+   - [ ] `name`: kebab-case identifier matching the directory name (max 64 chars).
+   - [ ] `description`: Third-person. Include `TRIGGER when:` and `DO NOT TRIGGER when:` clauses. Max 1024 chars.
+   - [ ] `compatibility` *(optional)*: restrict to specific platforms (e.g., `claude-code`).
+9. [ ] **Required sections** (in this order):
    - [ ] `## Overview` — what the skill does and why it exists.
+   - [ ] `## ✍️ Writing Principles` *(if skill involves authoring)* or equivalent guidance.
    - [ ] `## 🚀 Workflow Checklist` — numbered `[ ]` steps the agent executes.
    - [ ] `<HARD-GATE>` blocks — wrap any step requiring verification before continuing.
    - [ ] `## 📝 Anti-Patterns` — common mistakes to avoid.
    - [ ] `## 📂 Resources` — links to `references/` files or external docs.
-6. [ ] **Progressive Disclosure**: Keep SKILL.md under 500 lines. Move large tables, templates, or mappings to `references/<filename>.md`.
+10. [ ] **Progressive Disclosure**: Keep SKILL.md under 500 lines. Move large tables, templates, or mappings to `references/<filename>.md`.
 
 ### Phase 3 — Cross-Agent Wiring
 
@@ -59,18 +91,28 @@ ln -sf ../../.vibe/skills/<name> .gemini/skills/<name>
 Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden platform dirs.
 </HARD-GATE>
 
-7. [ ] Symlinks created and verified.
+11. [ ] Symlinks created and verified.
 
 ### Phase 4 — Validate
 
-8. [ ] **Self-test**: Invoke the skill with a simple test prompt. Confirm it follows its own checklist.
-9. [ ] **Lint** — verify SKILL.md has:
-   - [ ] YAML frontmatter with `name` and `description`
-   - [ ] `TRIGGER when:` and `DO NOT TRIGGER when:` in the description
-   - [ ] All five required sections present
-   - [ ] At least one `<HARD-GATE>` if the skill has destructive or external-state-dependent steps
-   - [ ] At least one Anti-Pattern entry
-10. [ ] **Commit**: `git add .vibe/skills/<name>/ && git commit -m "feat(skills): add <name> skill"`
+12. [ ] **Trigger evals** — create `evals/trigger-eval.json` using examples from Phase 0:
+
+```json
+[
+  {"query": "create a new skill for X", "should_trigger": true},
+  {"query": "run the repo-research skill", "should_trigger": false}
+]
+```
+
+13. [ ] **Self-test**: Invoke the skill with one should-trigger prompt. Confirm output follows the checklist.
+14. [ ] **Lint** — verify SKILL.md has:
+    - [ ] YAML frontmatter with `name` (≤ 64 chars) and `description` (≤ 1024 chars)
+    - [ ] `TRIGGER when:` and `DO NOT TRIGGER when:` in the description
+    - [ ] All required sections present
+    - [ ] At least one `<HARD-GATE>` if the skill has destructive or external-state-dependent steps
+    - [ ] At least one Anti-Pattern entry
+15. [ ] **Commit**: `git add .vibe/skills/<name>/ && git commit -m "feat(skills): add <name> skill"`
+16. [ ] **Package** *(optional)*: `python -m scripts.package_skill .vibe/skills/<name>` to produce a distributable `.skill` ZIP.
 
 ---
 
@@ -78,10 +120,10 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden plat
 
 | Rule | Requirement |
 |------|-------------|
-| Naming | Kebab-case, ≤ 3 words |
+| Naming | Kebab-case, ≤ 3 words, ≤ 64 chars |
 | Source of truth | `.vibe/skills/<name>/SKILL.md` |
 | Entrypoint | `SKILL.md` |
-| Description format | Third-person + `TRIGGER when` / `DO NOT TRIGGER when` |
+| Description format | Third-person + `TRIGGER when` / `DO NOT TRIGGER when`, ≤ 1024 chars |
 | Cross-agent wiring | All three platform symlinks required |
 | File size | < 500 lines per file |
 | Scope | One skill = one responsibility; split if checklist > 15 steps |
@@ -93,17 +135,18 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md and three hidden plat
 ```markdown
 ---
 name: kebab-case-identifier
-description: Third-person summary of what this skill does. TRIGGER when: <conditions that should invoke this skill>. DO NOT TRIGGER when: <conditions where this skill is wrong choice>.
+description: Third-person summary. TRIGGER when: <prompts that should invoke this skill>. DO NOT TRIGGER when: <prompts that must not invoke this skill>.
+compatibility: claude-code  # optional; omit to support all platforms
 ---
 
 # Skill Title
 
 ## Overview
-What this skill does and why it exists. Keep to one paragraph.
+What this skill does and why it exists. One paragraph.
 
 ## 🚀 Workflow Checklist
-1. [ ] Step one — [specific action]
-2. [ ] Step two — [specific action]
+1. [ ] Step one — [specific action and why]
+2. [ ] Step two — [specific action and why]
 
 <HARD-GATE>
 What must be verified before this step is considered complete.
@@ -124,13 +167,16 @@ DO NOT proceed until this condition is satisfied.
 
 ## 📝 Anti-Patterns
 
-- **Vague description**: "Does research" is not a description. Write `TRIGGER when:` / `DO NOT TRIGGER when:` explicitly — this is how Claude auto-selects the right skill.
+- **Skipping Phase 0**: Writing a skill without capturing intent leads to vague descriptions that never trigger correctly. Always answer the four questions first.
+- **Vague description**: "Does research" will not trigger reliably. Write `TRIGGER when:` / `DO NOT TRIGGER when:` with specific, realistic example prompts in mind.
+- **Over-specifying the workflow**: Listing every micro-step makes skills brittle. Apply the lean prompt principle — trust the model, specify the checkpoints.
+- **Missing the why**: `"Verify symlinks"` is weaker than `"Verify symlinks exist (cross-agent discoverability breaks without them)"`. Always explain the reason.
 - **Skipping cross-agent wiring**: A skill without platform symlinks is invisible to Gemini CLI and Codex. Always run Phase 3.
 - **Editing `.claude/skills/<name>/SKILL.md` directly**: Always edit the source at `.vibe/skills/<name>/SKILL.md`. CLI-specific directories should only contain symlinks.
 - **Monolithic SKILL.md**: Files over 500 lines slow context loading. Extract large references to `references/`.
 - **Missing HARD-GATEs**: Steps that write files, run destructive commands, or depend on external state MUST be gated.
 - **Over-scoped skill**: If the workflow checklist exceeds 15 steps, split into sub-skills with focused responsibilities.
-- **Missing Anti-Patterns**: Every skill should document what NOT to do — if you can't think of any, you haven't used the skill enough.
+- **Skipping trigger evals**: Without `evals/trigger-eval.json`, you have no way to know if the description is causing false positives or missed triggers.
 
 ---
 
@@ -142,9 +188,10 @@ DO NOT proceed until this condition is satisfied.
 | `scripts/` | Executable automation (`.cjs`, `.py`, `.sh`) |
 | `templates/` | Reusable output formats (e.g., digest templates) |
 | `assets/` | Static files, diagrams, or images |
+| `evals/` | Trigger eval queries (`trigger-eval.json`) and test outputs |
 
 ---
 
 ## 📂 Resources
-- [Built-in skill-creator](/skills activate skill-creator) — foundational principles
+- [Built-in skill-creator](/skills activate skill-creator) — foundational principles, eval tooling, description optimization
 - [VIBE.md cross-agent policy](../../VIBE.md)
