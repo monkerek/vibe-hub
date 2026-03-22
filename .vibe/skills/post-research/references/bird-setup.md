@@ -1,74 +1,123 @@
-# Bird Auth Setup Guide
+# Twitter/X Auth Setup — bird CLI
 
-One-time setup to enable Tier 0 (native) Twitter/X fetching via `@steipete/bird`.
+One-time setup to enable **Tier 0** (native browser-cookie) Twitter fetching.
 
-## Why This Is Needed
+> **Tier 0 is completely optional.** Without it, the skill automatically falls
+> through to Tier 1 (Jina Reader) and beyond. Degraded result quality for
+> login-walled tweets, but the skill still functions.
 
-Twitter/X's public pages require login to render tweet content. Proxy services
-(Jina Reader, defuddle.md) hit paywalls or empty responses. The `bird` CLI
-bypasses this by reusing your existing browser session tokens — the same
-`auth_token` and `ct0` cookies that keep you logged in on `x.com`.
+---
 
-## Project Config Structure
+## How It Works
 
-This project keeps a `.config/bird/credentials` symlink that points to your
-machine's `~/.config/bird/credentials`. The symlink is committed to the repo
-so the path convention is documented, but the target is always your local file.
+Twitter/X's website stores two cookies in your browser after login:
 
-**New contributors must recreate the symlink** using their own home directory:
+| Cookie | Purpose | Looks like |
+|---|---|---|
+| `auth_token` | Session identity token | 40-char hex: `a1b2c3d4e5f6...` |
+| `ct0` | CSRF token (cross-request forgery protection) | ~160-char alphanumeric string |
+
+The `bird` CLI passes these cookies directly to Twitter's internal GraphQL API —
+the same API that `x.com` itself uses. No official API key needed.
+
+**Tokens stay valid as long as you remain logged into x.com.** They expire only
+when you explicitly log out (or Twitter invalidates them remotely).
+
+---
+
+## Step 1 — Install bird
 
 ```bash
-mkdir -p ~/.config/bird
-ln -sf ~/.config/bird/credentials .config/bird/credentials
+npm install -g @steipete/bird
+bird --version   # should print: bird 0.8.0
 ```
 
 ---
 
-## Step 1 — Install
+## Step 2 — Extract Your Tokens
 
-```bash
-npm install -g @steipete/bird
+You need to be **logged in** to https://x.com in your browser first.
+
+### Chrome / Chromium / Arc / Brave / Edge
+
+1. Go to **https://x.com** (make sure you're logged in — you should see your timeline)
+2. Open DevTools:
+   - **Mac**: `Cmd + Option + I`
+   - **Windows/Linux**: `F12` or `Ctrl + Shift + I`
+3. Click the **Application** tab (you may need to click `>>` to find it)
+4. In the left sidebar: expand **Storage** → **Cookies** → click `https://x.com`
+5. You'll see a table of cookies. Use the search/filter box at the top to find each one:
+
+**Finding `auth_token`:**
+- Type `auth_token` in the filter box
+- Click the `auth_token` row
+- The **Value** column shows the token — it's a 40-character hex string like:
+  `a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2`
+- Double-click the value cell to select it, then copy (`Cmd+C` / `Ctrl+C`)
+
+**Finding `ct0`:**
+- Clear the filter, type `ct0`
+- Click the `ct0` row
+- The value is a long alphanumeric string (~160 chars)
+- Double-click to select the entire value, copy it
+
+> **Tip**: The Name column may truncate long values. Always double-click the
+> Value cell itself, not the Name cell, to get the full value.
+
+### Firefox
+
+1. Go to **https://x.com** while logged in
+2. Open DevTools: `F12` or `Ctrl + Shift + I` (Mac: `Cmd + Option + I`)
+3. Click the **Storage** tab
+4. In the left sidebar: expand **Cookies** → click `https://x.com`
+5. Find `auth_token` and `ct0` in the table — same process as Chrome above
+
+### Safari (macOS)
+
+1. Enable DevTools if needed: **Safari → Settings → Advanced → Show features for web developers**
+2. Go to **https://x.com** while logged in
+3. Open Web Inspector: `Cmd + Option + I` or **Develop → Show Web Inspector**
+4. Click the **Storage** tab → **Cookies** → `x.com`
+5. Find `auth_token` and `ct0`, double-click their values to copy
+
+### Alternative: Browser Console (Any Browser)
+
+Open DevTools → **Console** tab → paste this and press Enter:
+
+```javascript
+document.cookie.split('; ')
+  .filter(c => c.startsWith('auth_token=') || c.startsWith('ct0='))
+  .forEach(c => console.log(c))
 ```
 
-## Step 2 — Get Your Tokens
+This prints both values directly. Note: this only works on `x.com` itself (not in DevTools opened on another page).
 
-Open Chrome (or Firefox) and make sure you're logged into https://x.com
+---
 
-1. Press **F12** to open DevTools
-2. Go to **Application** tab → **Cookies** → `https://x.com`
-3. Find and copy the values for:
-   - `auth_token`
-   - `ct0`
-
-## Step 3 — Store the Credentials
+## Step 3 — Store Credentials in .env
 
 ```bash
-mkdir -p ~/.config/bird
-cat > ~/.config/bird/credentials << 'EOF'
-auth_token=YOUR_AUTH_TOKEN_VALUE
-ct0=YOUR_CT0_VALUE
-EOF
-chmod 600 ~/.config/bird/credentials
+# From the repo root:
+cp .vibe/skills/post-research/.env.example .vibe/skills/post-research/.env
 ```
 
-Then recreate the project symlink so `.config/bird/credentials` resolves to your file:
+Open `.vibe/skills/post-research/.env` and fill in the Twitter values:
 
 ```bash
-ln -sf ~/.config/bird/credentials .config/bird/credentials
+TWITTER_AUTH_TOKEN=a1b2c3d4e5f6...    # your 40-char auth_token value
+TWITTER_CT0=abcdef123456...           # your ~160-char ct0 value
 ```
 
-> **Never commit the credentials file itself.** Only the symlink is tracked.
-> `.config/bird/credentials` is a symlink — the actual file lives outside the repo.
-
-Alternatively, export as env vars instead of using the file (add to `~/.bashrc` or `~/.zshrc`):
+Set restrictive permissions (prevents other users on the machine from reading it):
 
 ```bash
-export TWITTER_AUTH_TOKEN="YOUR_AUTH_TOKEN_VALUE"
-export TWITTER_CT0="YOUR_CT0_VALUE"
+chmod 600 .vibe/skills/post-research/.env
 ```
 
-The `bird-read.sh` wrapper checks `$TWITTER_AUTH_TOKEN`/`$TWITTER_CT0` first,
-then falls back to the credentials file.
+> **The `.env` file is gitignored.** It will never be committed. The
+> `.env.example` file (which has empty values) is what's tracked in git.
+
+---
 
 ## Step 4 — Verify
 
@@ -76,53 +125,61 @@ then falls back to the credentials file.
 bash .vibe/skills/post-research/scripts/bird-check.sh
 ```
 
-Or directly:
-
-```bash
-source <(grep -E '^auth_token=|^ct0=' ~/.config/bird/credentials | sed 's/^/export TWITTER_/; s/auth_token/AUTH_TOKEN/; s/ct0/CT0/')
-bird whoami --auth-token "$TWITTER_AUTH_TOKEN" --ct0 "$TWITTER_CT0"
+Expected output on success:
+```
+bird: authenticated
 ```
 
-Expected output:
-```
-@YourHandle  Your Name
-```
+If you see `Tier 0 not configured`, check that `.env` has non-empty values.
+If you see `auth failed`, the tokens are stale — repeat Step 2.
 
-## Step 5 — Test a Read
+---
+
+## Step 5 — Test a Fetch
 
 ```bash
 # Single tweet
 bash .vibe/skills/post-research/scripts/bird-read.sh \
-  "https://x.com/user/status/1234567890" --json
+  "https://x.com/karpathy/status/1886192184808149383"
 
-# Full thread
+# Full thread (JSON output)
 bash .vibe/skills/post-research/scripts/bird-read.sh \
-  "https://x.com/user/status/1234567890" --thread --json
+  "https://x.com/karpathy/status/1886192184808149383" --thread --json
 ```
 
-## Token Expiry
+---
 
-Twitter tokens expire when you **log out of x.com**. As long as you stay logged
-in, tokens are persistent. If `bird-check.sh` fails, re-extract from DevTools
-and overwrite `~/.config/bird/credentials`.
+## Graceful Degradation
+
+When `bird-check.sh` exits non-zero, the skill **automatically skips Tier 0**
+and falls through to Tier 1 (Jina Reader). No crash, no error — just degraded
+fetch quality. The fetch method used is recorded in the digest metadata.
+
+| bird-check exit | Meaning | Skill behavior |
+|---|---|---|
+| `0` | Authenticated | Use bird (Tier 0) |
+| `2` | Not configured | Skip to Tier 1 silently |
+| `3` | Tokens expired | Skip to Tier 1, warn user |
+
+---
+
+## Token Expiry & Refresh
+
+Tokens do **not** have a fixed expiry date. They remain valid until:
+- You click **Log out** on x.com
+- Twitter remotely invalidates them (rare; happens after suspicious activity)
+- You change your password
+
+To refresh: repeat Step 2 and overwrite the values in `.env`. The file path
+and permissions don't need to change.
+
+---
 
 ## Platform Notes
 
-| Platform | Method | Notes |
+| Environment | Setup | Notes |
 |---|---|---|
-| macOS + Chrome | Auto-extraction or file | `bird whoami` works out of the box; file recommended for consistency |
-| macOS + Firefox | `--firefox-profile` or file | Use `bird whoami --firefox-profile default-release` to test |
-| Linux / headless | `~/.config/bird/credentials` | Manual setup required (no browser) |
-| Windows | File or manual | Use DevTools on x.com to extract tokens |
-
-## bird vs twitter-thread.com (Tier 2)
-
-| | `bird` (Tier 0) | `twitter-thread.com` (Tier 2) |
-|---|---|---|
-| Auth required | Yes (your session) | No |
-| Full thread support | `--thread --all` | Partial (public only) |
-| JSON output | `--json` | No |
-| Rate limits | Your account limits | Public rate limits |
-| Reliability | High | Breaks on login-walled tweets |
-
-Use `bird` whenever possible. Fall through to Tier 2 only if `bird-check.sh` fails.
+| macOS + Chrome/Firefox | Env file **or** auto-extraction | `bird` can read Chrome cookies directly without any config. Env file recommended for headless/CI use. |
+| Linux / headless | Env file required | No browser available; `.env` is the only option. |
+| Windows | Env file or Chrome DevTools | Use DevTools to extract, paste into `.env`. |
+| CI/CD | `TWITTER_AUTH_TOKEN` + `TWITTER_CT0` env vars | Export as secrets in your CI environment — no file needed. |

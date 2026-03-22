@@ -3,3 +3,8 @@ node_modules/
 .tmp/
 .DS_Store
 *.skill
+
+# Credential files — never commit actual secrets
+# .env.example files ARE committed (they are empty templates)
+.env
+**/.env
