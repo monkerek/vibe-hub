@@ -1,42 +1,22 @@
-import { describe, it, before } from 'node:test';
+import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFile, mkdtemp } from 'node:fs/promises';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { rm } from 'node:fs/promises';
 import { parseTranscript } from '../dist/data/transcript.js';
+import { assistantToolUse, userToolResult, makeTmpDir, writeTmpFile } from './helpers.js';
 
 let tmpDir;
 
 async function writeTmp(filename, lines) {
-  const path = join(tmpDir, filename);
-  await writeFile(path, lines.join('\n'), 'utf-8');
-  return path;
-}
-
-// Helpers to build real Claude Code transcript line shapes
-function assistantToolUse(id, name, input = {}) {
-  return JSON.stringify({
-    type: 'assistant',
-    message: {
-      role: 'assistant',
-      content: [{ type: 'tool_use', id, name, input }],
-    },
-  });
-}
-
-function userToolResult(toolUseId) {
-  return JSON.stringify({
-    type: 'user',
-    message: {
-      role: 'user',
-      content: [{ type: 'tool_result', tool_use_id: toolUseId, content: 'ok' }],
-    },
-  });
+  return writeTmpFile(tmpDir, filename, lines);
 }
 
 describe('parseTranscript', () => {
   before(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'transcript-test-'));
+    tmpDir = await makeTmpDir('transcript-test-');
+  });
+
+  after(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
   });
 
   it('returns empty arrays for nonexistent file', async () => {

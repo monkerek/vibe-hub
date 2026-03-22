@@ -1,89 +1,18 @@
-import { describe, it, before } from 'node:test';
+import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { writeFile, mkdtemp } from 'node:fs/promises';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
-import { buildSegments } from '../dist/render/segments.js';
+import { rm } from 'node:fs/promises';
 import { render } from '../dist/render/index.js';
 import { stripAnsi } from '../dist/render/colors.js';
 import { DEFAULT_CONFIG } from '../dist/config.js';
+import {
+  baseCtx,
+  buildWith,
+  assistantToolUse,
+  userToolResult,
+  makeTmpDir,
+  writeTmpFile,
+} from './helpers.js';
 import { parseTranscript } from '../dist/data/transcript.js';
-
-// ─── Shared helpers ──────────────────────────────────────────────────────────
-
-const baseStdin = {
-  model: { display_name: 'Claude 3.5' },
-  context_window: { used_percentage: 50, context_window_size: 200000 },
-};
-
-const baseCtx = {
-  stdin: baseStdin,
-  git: null,
-  tools: [],
-  agents: [],
-  todos: [],
-  motto: 'Test motto',
-  config: { ...DEFAULT_CONFIG },
-  terminalWidth: 120,
-  cwd: '/home/user/project',
-};
-
-function buildWith(overrides, segmentList) {
-  const ctx = { ...baseCtx, ...overrides };
-  ctx.config = {
-    ...baseCtx.config,
-    ...(overrides.config || {}),
-    layout: {
-      ...baseCtx.config.layout,
-      ...(overrides.config?.layout || {}),
-      segments: segmentList || overrides.config?.layout?.segments || baseCtx.config.layout.segments,
-    },
-  };
-  return buildSegments(ctx);
-}
-
-function renderWith(overrides, segmentList, mode = 'expanded') {
-  const ctx = {
-    ...baseCtx,
-    ...overrides,
-    config: {
-      ...DEFAULT_CONFIG,
-      ...(overrides.config || {}),
-      theme: { ...DEFAULT_CONFIG.theme, ...(overrides.config?.theme || {}) },
-      layout: {
-        mode,
-        segments: segmentList || DEFAULT_CONFIG.layout.segments,
-      },
-    },
-  };
-  return render(ctx);
-}
-
-// ─── JSONL helpers (same shape as real Claude Code transcripts) ───────────────
-
-function assistantToolUse(id, name, input = {}) {
-  return JSON.stringify({
-    type: 'assistant',
-    message: {
-      role: 'assistant',
-      content: [{ type: 'tool_use', id, name, input }],
-    },
-  });
-}
-
-function userToolResult(toolUseId) {
-  return JSON.stringify({
-    type: 'user',
-    message: {
-      role: 'user',
-      content: [{ type: 'tool_result', tool_use_id: toolUseId, content: 'ok' }],
-    },
-  });
-}
-
-// ─── Tests ───────────────────────────────────────────────────────────────────
-
-let tmpDir;
 
 describe('usage segment (segments level)', () => {
   it('shows bar and percentage', () => {
@@ -188,7 +117,6 @@ describe('tools segment — running with prior completions', () => {
         { name: 'Read', status: 'completed', count: 5 },
       ],
     }, ['tools']);
-    // total completed = 2 + 5 = 7
     assert.ok(segs[0].text.includes('×7'));
     assert.ok(segs[0].text.includes('Bash'));
   });
@@ -213,7 +141,7 @@ describe('rounded caps rendering', () => {
   const ROUND_LEFT  = '\ue0b6';
   const ROUND_RIGHT = '\ue0b4';
 
-  it('rounded=true produces left cap (U+E0B6)', () => {
+  it('rounded=true produces both left (U+E0B6) and right (U+E0B4) caps', () => {
     const ctx = {
       ...baseCtx,
       config: {
@@ -223,19 +151,7 @@ describe('rounded caps rendering', () => {
       },
     };
     const lines = render(ctx);
-    assert.ok(lines[0].includes(ROUND_LEFT), 'Expected left rounded cap U+E0B6');
-  });
-
-  it('rounded=true produces right cap (U+E0B4)', () => {
-    const ctx = {
-      ...baseCtx,
-      config: {
-        ...DEFAULT_CONFIG,
-        theme: { ...DEFAULT_CONFIG.theme, rounded: true },
-        layout: { mode: 'compact', segments: ['motto'] },
-      },
-    };
-    const lines = render(ctx);
+    assert.ok(lines[0].includes(ROUND_LEFT),  'Expected left rounded cap U+E0B6');
     assert.ok(lines[0].includes(ROUND_RIGHT), 'Expected right rounded cap U+E0B4');
   });
 
@@ -271,18 +187,19 @@ describe('rounded caps rendering', () => {
 });
 
 describe('end-to-end pipeline: JSONL → parseTranscript → render', () => {
+  let tmpDir;
+
   before(async () => {
-    tmpDir = await mkdtemp(join(tmpdir(), 'pipeline-test-'));
+    tmpDir = await makeTmpDir('pipeline-test-');
   });
 
-  async function writeTmp(filename, lines) {
-    const path = join(tmpDir, filename);
-    await writeFile(path, lines.join('\n'), 'utf-8');
-    return path;
-  }
+  after(async () => {
+    await rm(tmpDir, { recursive: true, force: true });
+  });
 
   it('tools from JSONL transcript appear in rendered output', async () => {
-    const path = await writeTmp('pipeline-tools.jsonl', [
+    // Bash completes once, Read completes once then runs again — total completed = 2
+    const path = await writeTmpFile(tmpDir, 'pipeline-tools.jsonl', [
       assistantToolUse('t1', 'Bash'),
       userToolResult('t1'),
       assistantToolUse('t2', 'Read'),
@@ -302,11 +219,11 @@ describe('end-to-end pipeline: JSONL → parseTranscript → render', () => {
     const lines = render(ctx);
     const text = lines.map(stripAnsi).join('\n');
     assert.ok(text.includes('Read'), 'running tool should appear');
-    assert.ok(text.includes('×'), 'completed count marker should appear');
+    assert.ok(text.includes('×2'), 'total completed count should be 2 (Bash×1 + Read×1)');
   });
 
   it('agents from JSONL transcript appear in rendered output', async () => {
-    const path = await writeTmp('pipeline-agents.jsonl', [
+    const path = await writeTmpFile(tmpDir, 'pipeline-agents.jsonl', [
       assistantToolUse('a1', 'Agent', { subagent_type: 'Explore', description: 'Find code' }),
       assistantToolUse('a2', 'Agent', { subagent_type: 'Plan', description: 'Design' }),
       userToolResult('a2'), // Plan completes
@@ -328,7 +245,7 @@ describe('end-to-end pipeline: JSONL → parseTranscript → render', () => {
   });
 
   it('todos from JSONL transcript appear in rendered output', async () => {
-    const path = await writeTmp('pipeline-todos.jsonl', [
+    const path = await writeTmpFile(tmpDir, 'pipeline-todos.jsonl', [
       assistantToolUse('tw1', 'TodoWrite', {
         todos: [
           { content: 'Write tests', status: 'in_progress', activeForm: 'Writing tests' },
@@ -354,7 +271,7 @@ describe('end-to-end pipeline: JSONL → parseTranscript → render', () => {
   });
 
   it('full pipeline: tools + agents + todos all render together', async () => {
-    const path = await writeTmp('pipeline-full.jsonl', [
+    const path = await writeTmpFile(tmpDir, 'pipeline-full.jsonl', [
       assistantToolUse('t1', 'Bash'),
       userToolResult('t1'),
       assistantToolUse('t2', 'Grep'), // still running
@@ -368,8 +285,6 @@ describe('end-to-end pipeline: JSONL → parseTranscript → render', () => {
     ]);
 
     const { tools, agents, todos } = await parseTranscript(path);
-
-    // Verify counts before rendering
     assert.equal(tools.length, 2);
     assert.equal(agents.length, 1);
     assert.equal(todos.length, 2);
@@ -385,12 +300,12 @@ describe('end-to-end pipeline: JSONL → parseTranscript → render', () => {
       },
     };
     const lines = render(ctx);
-    assert.ok(lines.length >= 2, 'should have primary and activity lines');
+    assert.equal(lines.length, 2, 'should have primary and activity lines');
 
     const allText = lines.map(stripAnsi).join('\n');
-    assert.ok(allText.includes('Grep'),         'running Grep tool shows');
-    assert.ok(allText.includes('×'),            'completed Bash shows count');
-    assert.ok(allText.includes('Explore'),      'running agent shows');
+    assert.ok(allText.includes('Grep'),           'running Grep tool shows');
+    assert.ok(allText.includes('×1'),             'completed Bash shows count');
+    assert.ok(allText.includes('Explore'),        'running agent shows');
     assert.ok(allText.includes('Review changes'), 'in_progress todo shows');
   });
 });

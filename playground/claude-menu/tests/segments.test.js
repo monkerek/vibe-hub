@@ -1,39 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildSegments } from '../dist/render/segments.js';
-import { DEFAULT_CONFIG } from '../dist/config.js';
-
-const baseStdin = {
-  model: { display_name: 'Claude 3.5' },
-  context_window: { used_percentage: 50, context_window_size: 200000 },
-};
-
-const baseCtx = {
-  stdin: baseStdin,
-  git: null,
-  tools: [],
-  agents: [],
-  todos: [],
-  motto: 'Test motto',
-  config: { ...DEFAULT_CONFIG },
-  terminalWidth: 120,
-  cwd: '/home/user/project',
-};
-
-// Build segments with specific overrides and optional segment list
-function buildWith(overrides, segmentList) {
-  const ctx = { ...baseCtx, ...overrides };
-  ctx.config = {
-    ...baseCtx.config,
-    ...(overrides.config || {}),
-    layout: {
-      ...baseCtx.config.layout,
-      ...(overrides.config?.layout || {}),
-      segments: segmentList || overrides.config?.layout?.segments || baseCtx.config.layout.segments,
-    },
-  };
-  return buildSegments(ctx);
-}
+import { baseStdin, baseCtx, buildWith } from './helpers.js';
 
 const cleanGit = {
   branch: 'main',
