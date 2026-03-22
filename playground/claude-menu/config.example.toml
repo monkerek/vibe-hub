@@ -1,0 +1,77 @@
+# ────────────────────────────────────────────────────────────────────────────
+# Claude Menu — Configuration
+# ────────────────────────────────────────────────────────────────────────────
+# Copy this file to: ~/.claude/plugins/claude-menu/config.toml
+# All fields are optional — defaults are used for anything not specified.
+
+# ─── Theme ───────────────────────────────────────────────────────────────────
+# Built-in themes: pastel-rainbow, claude-orange, nord-frost, dracula,
+#                  catppuccin, monochrome
+[theme]
+name = "pastel-rainbow"
+separator = ""            # Powerline arrow. Try "" for thin, "│" for pipe
+
+# Override individual segment colors (optional):
+# [theme.segments.motto]
+# fg = "#1e1e2e"
+# bg = "#a6e3a1"
+# icon = "🐱"
+#
+# [theme.segments.model]
+# fg = "#ffffff"
+# bg = "#ea580c"
+# icon = "🧠"
+
+# ─── Layout ──────────────────────────────────────────────────────────────────
+# mode: "expanded" (2 lines) or "compact" (1 line)
+# segments: ordered list of what to show
+[layout]
+mode = "expanded"
+segments = ["motto", "project", "git", "model", "context", "time"]
+
+# Available segments:
+#   motto       — Dynamic motto / status message
+#   model       — Current Claude model name
+#   project     — Working directory (short path)
+#   git         — Branch + dirty/ahead/behind/file stats
+#   context     — Context window usage bar (████░░ 45%)
+#   usage       — API rate limit usage bar
+#   tools       — Active/completed tool calls
+#   agents      — Running/completed agents
+#   todos       — Todo progress (▸ task (3/7))
+#   environment — CLAUDE.md / rules / MCPs / hooks counts
+#   time        — Current time (HH:MM)
+
+# ─── Motto ───────────────────────────────────────────────────────────────────
+# strategy: "day-of-week", "random", "sequential", "time-of-day", "manual"
+# pack: built-in pack name ("motivational-en", "chill-zh", "dev-humor",
+#        "zen", "startup-energy")
+[motto]
+enabled = true
+strategy = "day-of-week"
+pack = "motivational-en"
+emoji = true
+
+# ── Custom mottos (overrides pack) ──
+# custom = [
+#   "🚀 Let's build!",
+#   "🐱 在家躺平 补觉充电",
+#   "☕ Coffee first, code second",
+# ]
+
+# ── Day-of-week mapping (optional, used with strategy = "day-of-week") ──
+# [motto.dayOfWeek]
+# monday    = "🔥 New week, new features"
+# tuesday   = "🏗️ Building momentum"
+# wednesday = "🐫 Hump day hustle"
+# thursday  = "⚡ Almost there"
+# friday    = "🎉 Ship it Friday!"
+# saturday  = "🌿 Weekend hacking"
+# sunday    = "🧘 Rest and recharge"
+
+# ── Time-of-day mapping (optional, used with strategy = "time-of-day") ──
+# [motto.timeOfDay]
+# morning   = "☀️ Good morning! Fresh start."
+# afternoon = "☕ Afternoon focus mode"
+# evening   = "🌙 Evening deep work"
+# night     = "🦉 Night owl coding"

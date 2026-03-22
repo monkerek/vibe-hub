@@ -1,0 +1,20 @@
+{
+  "name": "claude-menu",
+  "version": "0.1.0",
+  "description": "A Starship-inspired statusline plugin for Claude Code with powerline segments, dynamic mottos, and configurable themes.",
+  "author": "vibe-hub",
+  "homepage": "https://github.com/vibe-hub/claude-menu",
+  "main": "../dist/index.js",
+  "commands": [
+    {
+      "name": "setup",
+      "description": "Set up Claude Menu as your statusline",
+      "file": "../commands/setup.md"
+    },
+    {
+      "name": "configure",
+      "description": "Interactive configuration wizard for themes, mottos, and segments",
+      "file": "../commands/configure.md"
+    }
+  ]
+}

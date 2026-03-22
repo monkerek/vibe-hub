@@ -1,0 +1,21 @@
+{
+  "name": "claude-menu",
+  "version": "0.1.0",
+  "description": "A Starship-inspired statusline plugin for Claude Code with dynamic mottos, powerline segments, and configurable themes.",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test tests/**/*.test.js",
+    "test:coverage": "c8 node --test tests/**/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["claude-code", "statusline", "plugin", "starship", "powerline"],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0",
+    "c8": "^10.1.0"
+  }
+}
