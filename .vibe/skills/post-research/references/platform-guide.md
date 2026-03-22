@@ -6,15 +6,16 @@ Per-platform fetch behavior, known limitations, and URL normalization for the `p
 
 ## 🔄 Fetch Fallback Chain
 
-All fetch attempts follow this priority order, mirroring the `web-fetcher` skill:
+All fetch attempts follow this priority order:
 
-| Tier | Service | URL Pattern | Notes |
+| Tier | Service | Scope | Notes |
 |---|---|---|---|
-| 1 | **Jina Reader** | `https://r.jina.ai/<url>` | Best Markdown quality; use `Accept: text/markdown` header. Free tier: 100 RPM. |
-| 2 | **twitter-thread.com** *(Twitter/X only)* | `https://twitter-thread.com/t/<tweet-id>` | Public thread reader; extract tweet ID from URL. |
-| 3 | **defuddle.md** | `https://defuddle.md/<url>` | Good fallback for structured articles; less reliable on SPAs. |
-| 4 | **markdown.new** | `https://markdown.new/<url>` | Last-resort converter; output quality varies. |
-| 5 | **Search Synthesis** | `WebSearch` tool with author + topic keywords | Use when all proxy tiers fail. Returns third-party commentary — NOT the original post. Label digest `Fetch Method: search-synthesis`. Works for viral posts; unreliable for obscure or very recent content. |
+| 0 | **Platform CLI** | Twitter: `bird` · Red Note: `redbook` | Native browser-cookie auth; most reliable. Requires one-time setup. |
+| 1 | **Jina Reader** | All | `https://r.jina.ai/<url>`. Best Markdown quality; use `Accept: text/markdown` header. |
+| 2 | **twitter-thread.com** | Twitter/X only | `https://twitter-thread.com/t/<tweet-id>`. Public thread reader. |
+| 3 | **defuddle.md** | All | Good fallback for structured articles; less reliable on SPAs. |
+| 4 | **markdown.new** | All | Last-resort converter; output quality varies. |
+| 5 | **Search Synthesis** | All | `WebSearch` with author + topic keywords. Returns third-party commentary — NOT the original post. Label digest `Fetch Method: search-synthesis`. |
 
 Stop at the first tier that returns ≥ 100 characters without auth-wall signals. If all tiers including WebSearch fail, report all errors and stop.
 
@@ -35,17 +36,25 @@ Stop at the first tier that returns ≥ 100 characters without auth-wall signals
 
 Attempt in this order for Twitter/X URLs:
 
-1. **Jina Reader**: `r.jina.ai/https://x.com/<user>/status/<id>` — extracts tweet text, author handle, sometimes reply counts
-2. **twitter-thread.com**: `https://twitter-thread.com/t/<tweet-id>` — public reader that renders full threads without auth; construct from the status ID in the original URL
-3. **defuddle.md** / **markdown.new** — generic fallbacks (see global fallback chain above)
+**Tier 0 — `bird` CLI (preferred when authenticated)**:
+```bash
+bash .vibe/skills/post-research/scripts/bird-check.sh           # verify auth
+bash .vibe/skills/post-research/scripts/bird-read.sh <url>       # single tweet
+bash .vibe/skills/post-research/scripts/bird-read.sh <url> --thread --json  # full thread
+```
+Install: `npm install -g @steipete/bird`. Requires one-time token setup — see `references/bird-setup.md`. Reads `$TWITTER_AUTH_TOKEN`/`$TWITTER_CT0` from env or `~/.config/bird/credentials`. Bypasses all proxy blocks. Supports threads natively with `--thread --all`.
 
-Auth-wall signal: response contains `"Sign in to X"` or `"Log in"` — treat as failure
+**Tier 1 — Jina Reader**: `r.jina.ai/https://x.com/<user>/status/<id>` — extracts tweet text, author handle, sometimes reply counts.
+
+**Tier 2 — twitter-thread.com**: `https://twitter-thread.com/t/<tweet-id>` — public thread reader without auth; extract tweet ID from the status URL.
+
+**Tier 3–4 — defuddle.md / markdown.new** — generic fallbacks.
+
+Auth-wall signal: response contains `"Sign in to X"` or `"Log in"` — treat as failure.
 
 ### Threads
-- Threads are not a single URL. Each tweet in a thread has its own `/status/<id>`.
-- If the user provides only the first tweet URL, fetch it and look for a "Show this thread" link in the Markdown output.
-- Fetch each subsequent tweet URL individually and concatenate before synthesizing.
-- Cap at 20 tweets per thread to avoid runaway fetching.
+- **With `bird`**: use `bird-read.sh <url> --thread --json` — fetches all tweets in the conversation in a single call.
+- **Without `bird`**: threads are not a single URL. Fetch the first tweet, look for a "Show this thread" link in the Markdown output, then fetch each subsequent tweet URL individually and concatenate. Cap at 20 tweets.
 
 ### WebSearch Fallback (Tier 5) for Twitter
 - Search by **author + topic keywords**, not by tweet ID — ID-only searches rarely surface exact content

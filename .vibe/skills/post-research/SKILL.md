@@ -23,7 +23,9 @@ You MUST follow this checklist for every post research task:
 
 1. [ ] **Identify & Triage**: Confirm the URL and detect the platform (Twitter/X, Red Note, or blog). See `references/platform-guide.md` for per-platform quirks.
 2. [ ] **Fetch Content**: Attempt each source in order, stopping at the first success. Log the response length at each step.
-   - **Tier 0 — Platform CLI** *(Red Note only)*: `redbook read <url>` — native CLI using browser cookies; requires one-time `redbook whoami` auth setup. Skip if not authenticated.
+   - **Tier 0 — Platform CLI** *(Twitter/X and Red Note)*: Native browser-cookie auth — most reliable, bypasses all proxy blocks. Run auth check first; skip tier if not authenticated.
+     - Twitter/X: `bash scripts/bird-check.sh && bash scripts/bird-read.sh <url> [--thread] --json`
+     - Red Note: `bash scripts/redbook-check.sh && bash scripts/redbook-read.sh <url> --json`
    - **Tier 1 — Jina Reader**: `r.jina.ai/<url>` with header `Accept: text/markdown`
    - **Tier 2 — twitter-thread.com** *(Twitter/X only)*: `https://twitter-thread.com/t/<tweet-id>` (public thread reader; extract the tweet ID from the original URL)
    - **Tier 3 — defuddle.md**: `defuddle.md/<url>` (fallback if prior tiers fail or return < 100 chars)
@@ -71,6 +73,9 @@ In all three cases, report the specific failure reason and stop.
 
 - **`references/platform-guide.md`**: Per-platform fetch behavior, known limitations, and URL patterns for Twitter/X, Red Note, and tech blogs.
 - **`references/templates.md`**: Digest templates for each content shape (single post, thread, long-form article).
+- **`references/bird-setup.md`**: One-time setup guide for `bird` CLI auth (`auth_token` + `ct0` for Twitter/X Tier 0).
 - **`references/redbook-setup.md`**: One-time setup guide for `redbook` CLI auth (cookie extraction for Red Note Tier 0).
-- **`scripts/redbook-read.sh`**: Wrapper for `redbook read` — resolves cookies from env var or config file automatically.
-- **`scripts/redbook-check.sh`**: Auth health check — run before Tier 0 attempts.
+- **`scripts/bird-read.sh`**: Wrapper for `bird read`/`bird thread` — resolves `auth_token`+`ct0` from env or `~/.config/bird/credentials` automatically.
+- **`scripts/bird-check.sh`**: Twitter auth health check — run before Tier 0 attempts.
+- **`scripts/redbook-read.sh`**: Wrapper for `redbook read` — resolves cookies from env var or `~/.config/redbook/cookie-string` automatically.
+- **`scripts/redbook-check.sh`**: Red Note auth health check — run before Tier 0 attempts.
