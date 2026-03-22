@@ -23,3 +23,4 @@ Refer to `.vibe/skills/skill-author/SKILL.md` for the mandatory creation workflo
 - @./doc-research/SKILL.md
 - @./gaslighting/SKILL.md
 - @./skill-author/SKILL.md
+- @./address-feedback/SKILL.md
