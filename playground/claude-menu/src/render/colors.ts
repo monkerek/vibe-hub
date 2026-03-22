@@ -39,20 +39,19 @@ export function stripAnsi(str: string): string {
   return str.replace(/\x1b\[[0-9;]*m/g, '');
 }
 
+// Reuse a single Segmenter instance across all visibleLength calls
+const GRAPHEME_SEGMENTER: Intl.Segmenter | null =
+  typeof Intl !== 'undefined' && Intl.Segmenter
+    ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
+    : null;
+
 export function visibleLength(str: string): number {
   const stripped = stripAnsi(str);
   let len = 0;
-  // Use Intl.Segmenter if available for accurate grapheme counting
-  if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-    for (const segment of segmenter.segment(stripped)) {
+  if (GRAPHEME_SEGMENTER) {
+    for (const segment of GRAPHEME_SEGMENTER.segment(stripped)) {
       const cp = segment.segment.codePointAt(0) || 0;
-      // Wide characters (CJK, emoji)
-      if (isWide(cp)) {
-        len += 2;
-      } else {
-        len += 1;
-      }
+      len += isWide(cp) ? 2 : 1;
     }
   } else {
     len = stripped.length;
