@@ -42,11 +42,14 @@ async function readCache() {
     return undefined;
 }
 async function writeCache(data) {
-    const { writeFile, mkdir } = await import('node:fs/promises');
+    const { writeFile, mkdir, rename } = await import('node:fs/promises');
     const dir = join(homedir(), '.claude', 'plugins', 'claude-menu');
+    const cachePath = getCachePath();
+    const tmpPath = cachePath + '.tmp';
     try {
         await mkdir(dir, { recursive: true });
-        await writeFile(getCachePath(), JSON.stringify({ data, timestamp: Date.now() }), 'utf-8');
+        await writeFile(tmpPath, JSON.stringify({ data, timestamp: Date.now() }), 'utf-8');
+        await rename(tmpPath, cachePath);
     }
     catch {
         // non-critical

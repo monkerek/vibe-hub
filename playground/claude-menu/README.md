@@ -110,6 +110,8 @@ Walks you through every config option — theme, layout, segments, and mottos �
 
 All config lives in `~/.claude/plugins/claude-menu/config.toml`. Every field is optional — sensible defaults are used for anything omitted.
 
+> **Note:** The config parser is a minimal, zero-dependency TOML subset. It supports sections (`[section]`), nested sections (`[section.sub]`), strings (single/double-quoted with escape sequences), booleans, numbers, and inline arrays. It does **not** support multi-line strings (`"""`/`'''`), arrays of tables (`[[...]]`), inline tables (`{ key = val }`), or date/datetime values. If you need these features, keep your config simple or consider splitting complex values into multiple keys.
+
 ### Theme
 
 ```toml
@@ -337,7 +339,7 @@ claude-menu/
 │       ├── colors.ts         # Hex→RGB ANSI helpers, progress bar, wide-char support
 │       ├── segments.ts       # Individual segment renderers
 │       └── index.ts          # Powerline compositor, expanded/compact modes
-├── tests/                    # Node test runner test suites (265 tests)
+├── tests/                    # Node test runner test suites (379 tests)
 ├── commands/                 # Claude Code slash command definitions
 ├── .claude-plugin/           # Plugin metadata
 └── config.example.toml       # Annotated example configuration
@@ -353,7 +355,7 @@ npm run dev        # Watch mode
 ### Test
 
 ```bash
-npm test           # Run all 265 tests
+npm test           # Run all 379 tests
 npm run test:coverage   # Run with c8 coverage report
 ```
 
@@ -370,7 +372,7 @@ echo '{"model":{"display_name":"claude-sonnet-4-6"},"context_window":{"used_perc
 
 ## How it works
 
-Claude Code pipes a JSON payload to the statusline command on stdin each time the statusline is refreshed. `readStdin` parses this with a 500 ms timeout so it never blocks.
+Claude Code pipes a JSON payload to the statusline command on stdin each time the statusline is refreshed. `readStdin` parses this with a 2-second timeout (with an immediate fast-path when stdin is a TTY) so it never blocks.
 
 Simultaneously, three parallel async operations run:
 
