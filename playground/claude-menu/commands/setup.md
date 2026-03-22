@@ -4,58 +4,84 @@ Set up Claude Menu as your Claude Code statusline.
 
 ## Instructions
 
-Follow these steps exactly. Use bash tools to execute each command.
+Follow these steps in order. Use bash tools to execute commands.
 
-### Step 1: Find the dist/index.js path
+---
 
-Run this search to locate the claude-menu installation:
+### Step 1: Find the claude-menu directory
 
-```bash
-find "$HOME" -maxdepth 6 -name "index.js" -path "*/claude-menu/dist/index.js" 2>/dev/null | head -5
-```
-
-If the search returns results, confirm the correct path with the user (there may be multiple clones). If nothing is found, ask the user to provide the absolute path to their `claude-menu/dist/index.js`.
-
-Once you have the path, verify it exists:
+Check common locations in this order, stopping at the first match:
 
 ```bash
-test -f "/absolute/path/to/claude-menu/dist/index.js" && echo "EXISTS" || echo "MISSING — run: npm run build"
+# 1a. Current directory
+test -f "$(pwd)/dist/index.js" && echo "FOUND:$(pwd)/dist/index.js"
+
+# 1b. playground subdirectory (monorepo layout)
+test -f "$(pwd)/playground/claude-menu/dist/index.js" && echo "FOUND:$(pwd)/playground/claude-menu/dist/index.js"
 ```
 
-If the file is MISSING, instruct the user to run `npm run build` inside the claude-menu directory first, then re-run this command.
+If found, use that path as DIST.
 
-### Step 2: Write the statusLine to ~/.claude/settings.json
+If not found, ask the user:
 
-Read `~/.claude/settings.json` (create it as `{}` if it doesn't exist), then add or replace the `statusLine` field:
+> I can't locate `dist/index.js` automatically. Please open a terminal, `cd` into your `claude-menu` directory, and run `pwd`. Paste the output here.
+
+Append `/dist/index.js` to get DIST.
+
+---
+
+### Step 2: Verify the build exists
+
+```bash
+test -f "DIST" && echo "EXISTS" || echo "MISSING"
+```
+
+Replace `DIST` with the actual path.
+
+If MISSING, instruct the user to run these commands in the claude-menu directory, then re-run `/claude-menu:setup`:
+
+```bash
+npm install
+npm run build
+```
+
+Stop here until the build exists.
+
+---
+
+### Step 3: Write statusLine to ~/.claude/settings.json
+
+Read `~/.claude/settings.json`. If the file doesn't exist, start with `{}`.
+
+Add or update only the `statusLine` field — preserve all other existing fields:
 
 ```json
 {
-  "statusLine": "node /absolute/path/to/claude-menu/dist/index.js"
+  "statusLine": "node DIST"
 }
 ```
 
-Preserve all other existing fields. Write the updated JSON back to `~/.claude/settings.json`. Validate it is well-formed JSON after writing.
+Replace `DIST` with the actual absolute path. Write the result back to `~/.claude/settings.json` and confirm it is valid JSON.
 
-### Step 3: Install the config (if not already present)
+---
 
-Check whether `~/.claude/plugins/claude-menu/config.toml` already exists:
+### Step 4: Install the config (if missing)
+
+Check:
 
 ```bash
 test -f "$HOME/.claude/plugins/claude-menu/config.toml" && echo "EXISTS" || echo "MISSING"
 ```
 
-If MISSING, create the directory and write a starter config:
+If MISSING, create it:
 
 ```bash
 mkdir -p "$HOME/.claude/plugins/claude-menu"
 ```
 
-Then write `~/.claude/plugins/claude-menu/config.toml` with this content:
+Then write `~/.claude/plugins/claude-menu/config.toml` with this exact content (no inline comments):
 
 ```toml
-# Claude Menu Configuration
-# Run /claude-menu:configure to customise themes, mottos, and segments.
-
 [theme]
 name = "pastel-rainbow"
 separator = ""
@@ -72,20 +98,30 @@ pack = "motivational-en"
 emoji = true
 ```
 
-### Step 4: Smoke-test the statusline
+The `separator` value above contains the powerline arrow glyph (U+E0B0) between the quotes. Write the character directly, not a description of it.
 
-Run a quick render to confirm the binary works (substitute the real path):
+---
+
+### Step 5: Smoke-test
+
+Run a render using the real DIST path:
 
 ```bash
 echo '{"model":{"display_name":"claude-sonnet-4-6"},"context_window":{"used_percentage":34,"context_window_size":200000},"cwd":"/home/user/my-project"}' \
-  | node /absolute/path/to/claude-menu/dist/index.js
+  | node DIST
 ```
 
-Show the output to the user. If it prints colored powerline segments the setup is working. If it prints nothing or errors, report the error.
+Show the output. Colored powerline segments means success. Empty output or an error means the build is broken — tell the user to run `npm run build` in the claude-menu directory.
 
-### Step 5: Confirm
+---
+
+### Step 6: Confirm
 
 Tell the user:
 
-> **Claude Menu is set up!** Restart Claude Code to see your new statusline.
-> Run `/claude-menu:configure` to customize themes, layout, and mottos.
+> **Claude Menu is set up!**
+> - `statusLine` written to `~/.claude/settings.json`
+> - Config at `~/.claude/plugins/claude-menu/config.toml`
+>
+> **Restart Claude Code** to activate the statusline.
+> Run `/claude-menu:configure` to customize themes, mottos, and segments.
