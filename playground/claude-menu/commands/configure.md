@@ -39,17 +39,17 @@ Record the chosen `THEME_NAME`.
 Then ask about the powerline separator. Present these as numbered choices:
 
 ```
-1  (no separator — plain blocks)
-2  │  (pipe)
-3    (powerline arrow — requires Nerd Font)
-4    (thin arrow — requires Nerd Font)
+1  (none)   No separator — plain blocks
+2  │        Pipe character (U+007C)
+3  (U+E0B0) Filled powerline arrow — requires Nerd Font
+4  (U+E0B1) Thin powerline arrow — requires Nerd Font
 ```
 
 Record `SEPARATOR` as exactly one of these character values:
 - Choice 1 → empty string (no character)
-- Choice 2 → │
-- Choice 3 → the powerline arrow glyph
-- Choice 4 → the thin arrow glyph
+- Choice 2 → │ (U+007C)
+- Choice 3 → the U+E0B0 filled powerline arrow glyph
+- Choice 4 → the U+E0B1 thin powerline arrow glyph
 
 Then ask: "Enable rounded caps? (requires Nerd Font) [Y/n]". Record `ROUNDED` as `true` or `false`.
 
@@ -144,9 +144,9 @@ emoji = true
 
 For `separator`:
 - If the user chose no separator: write `separator = ""`
-- If they chose │: write `separator = "│"`
-- If they chose the powerline arrow: write `separator = ""` (with the  glyph between the quotes)
-- If they chose the thin arrow: write `separator = ""` (with the  glyph between the quotes)
+- If they chose │ (option 2): write `separator = "│"`
+- If they chose the filled powerline arrow (option 3, U+E0B0): write `separator = ""` with the literal U+E0B0 character between the quotes — produce it with `printf '\uE0B0'` if needed
+- If they chose the thin powerline arrow (option 4, U+E0B1): write `separator = ""` with the literal U+E0B1 character between the quotes — produce it with `printf '\uE0B1'` if needed
 
 Ask the user to confirm. If they say yes, write the config:
 

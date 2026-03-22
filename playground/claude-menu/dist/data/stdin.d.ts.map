@@ -1,1 +1,1 @@
-{"version":3,"file":"stdin.d.ts","sourceRoot":"","sources":["../../src/data/stdin.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,aAAa,CAAC;AAE7C,wBAAsB,SAAS,IAAI,OAAO,CAAC,SAAS,CAAC,CAmBpD"}
+{"version":3,"file":"stdin.d.ts","sourceRoot":"","sources":["../../src/data/stdin.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,aAAa,CAAC;AAE7C,wBAAsB,SAAS,IAAI,OAAO,CAAC,SAAS,CAAC,CA0BpD"}

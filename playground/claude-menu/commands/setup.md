@@ -101,7 +101,7 @@ pack = "motivational-en"
 emoji = true
 ```
 
-The `separator` value above contains the powerline arrow glyph (U+E0B0) between the quotes. Write the character directly, not a description of it.
+The `separator` field must contain the literal U+E0B0 powerline arrow glyph between the quotes. This character may look identical to an empty string in plain-text viewers that lack Nerd Font support. To produce the character programmatically: `printf '\uE0B0'`. To use no separator instead, write `separator = ""` with nothing between the quotes.
 
 ---
 
