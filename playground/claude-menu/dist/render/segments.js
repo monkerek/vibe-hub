@@ -90,7 +90,8 @@ function renderTools(ctx) {
     if (ctx.tools.length === 0)
         return undefined;
     const running = ctx.tools.filter(t => t.status === 'running');
-    const completed = ctx.tools.reduce((sum, t) => sum + (t.status === 'completed' ? t.count : 0), 0);
+    // Sum completed counts across ALL tools (including tools that are also currently running)
+    const completed = ctx.tools.reduce((sum, t) => sum + t.count, 0);
     const parts = [];
     if (running.length > 0) {
         parts.push(`◐ ${running.map(t => t.name).join(', ')}`);
