@@ -1,6 +1,8 @@
 import { readFile } from 'node:fs/promises';
 export async function parseTranscript(path) {
-    const tools = new Map();
+    // Track each tool invocation by its tool_use id
+    const invocations = new Map();
+    // Track agent launches by their tool_use id
     const agents = new Map();
     const todos = [];
     try {
@@ -11,7 +13,7 @@ export async function parseTranscript(path) {
                 continue;
             try {
                 const entry = JSON.parse(line);
-                processEntry(entry, tools, agents, todos);
+                processLine(entry, invocations, agents, todos);
             }
             catch {
                 // skip malformed lines
@@ -21,76 +23,89 @@ export async function parseTranscript(path) {
     catch {
         // file not found or unreadable
     }
+    // Aggregate invocations by tool name: count = completed calls,
+    // status = 'running' if any invocation for that name is still in progress.
+    const toolMap = new Map();
+    for (const inv of invocations.values()) {
+        const existing = toolMap.get(inv.name);
+        if (existing) {
+            if (!inv.completed) {
+                existing.status = 'running';
+            }
+            else {
+                existing.count++;
+            }
+        }
+        else {
+            toolMap.set(inv.name, {
+                name: inv.name,
+                status: inv.completed ? 'completed' : 'running',
+                count: inv.completed ? 1 : 0,
+            });
+        }
+    }
     return {
-        tools: Array.from(tools.values()),
+        tools: Array.from(toolMap.values()),
         agents: Array.from(agents.values()),
         todos,
     };
 }
-function processEntry(entry, tools, agents, todos) {
-    const type = entry.type;
-    // Tool use tracking
-    if (type === 'tool_use' || type === 'tool_result') {
-        const name = entry.name || 'unknown';
-        const existing = tools.get(name);
-        if (existing) {
-            existing.count++;
-            if (type === 'tool_result')
-                existing.status = 'completed';
-        }
-        else {
-            tools.set(name, {
-                name,
-                status: type === 'tool_result' ? 'completed' : 'running',
-                count: 1,
-            });
-        }
-    }
-    // Agent tracking
-    if (type === 'agent_launch' || type === 'agent_complete') {
-        const id = entry.agent_id || entry.id || '';
-        const agentType = entry.agent_type || entry.subagent_type || 'agent';
-        if (id) {
-            const existing = agents.get(id);
-            if (existing) {
-                if (type === 'agent_complete') {
-                    existing.status = 'completed';
-                    existing.durationMs = entry.duration_ms || undefined;
+// Real Claude Code transcript format: each line is a JSON object whose
+// tool/agent/todo events live inside entry.message.content[] as content blocks.
+// entry.type is "assistant" | "user" | "system" etc. — NOT "tool_use".
+function processLine(entry, invocations, agents, todos) {
+    const message = entry.message;
+    if (!message)
+        return;
+    const content = message.content;
+    if (!Array.isArray(content))
+        return;
+    for (const block of content) {
+        const blockType = block.type;
+        if (blockType === 'tool_use') {
+            const id = block.id;
+            const name = block.name || 'unknown';
+            const input = (block.input ?? {});
+            if (name === 'TodoWrite') {
+                const todosInput = input.todos;
+                if (Array.isArray(todosInput)) {
+                    todos.length = 0;
+                    for (const t of todosInput) {
+                        const taskContent = t.content || '';
+                        if (taskContent) {
+                            todos.push({
+                                content: taskContent,
+                                status: (t.status || 'pending'),
+                            });
+                        }
+                    }
+                }
+            }
+            else if (name === 'Agent') {
+                if (id) {
+                    agents.set(id, {
+                        type: input.subagent_type || input.agent_type || 'agent',
+                        description: input.description,
+                        status: 'running',
+                    });
                 }
             }
             else {
-                agents.set(id, {
-                    type: agentType,
-                    model: entry.model,
-                    description: entry.description,
-                    status: type === 'agent_complete' ? 'completed' : 'running',
-                    durationMs: entry.duration_ms || undefined,
-                });
+                if (id) {
+                    invocations.set(id, { name, completed: false });
+                }
             }
         }
-    }
-    // Todo tracking (TodoWrite / Task blocks)
-    if (type === 'TodoWrite' || type === 'Task' || type === 'TaskCreate' || type === 'TaskUpdate') {
-        const content = entry.content || entry.task || '';
-        const status = entry.status || 'pending';
-        if (content) {
-            const existing = todos.findIndex(t => t.content === content);
-            if (existing >= 0) {
-                todos[existing].status = status;
+        else if (blockType === 'tool_result') {
+            const toolUseId = block.tool_use_id;
+            if (!toolUseId)
+                continue;
+            if (agents.has(toolUseId)) {
+                agents.get(toolUseId).status = 'completed';
             }
-            else {
-                todos.push({ content, status: status });
+            else if (invocations.has(toolUseId)) {
+                invocations.get(toolUseId).completed = true;
             }
-        }
-    }
-    // Handle nested todos arrays (from TodoWrite tool results)
-    if (entry.todos && Array.isArray(entry.todos)) {
-        todos.length = 0; // replace with latest snapshot
-        for (const t of entry.todos) {
-            todos.push({
-                content: t.content || '',
-                status: (t.status || 'pending'),
-            });
         }
     }
 }

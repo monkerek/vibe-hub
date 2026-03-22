@@ -91,7 +91,7 @@ export const DEFAULT_CONFIG = {
     },
     layout: {
         mode: 'expanded',
-        segments: ['motto', 'project', 'git', 'model', 'context', 'time'],
+        segments: ['motto', 'project', 'git', 'model', 'context', 'time', 'tools', 'agents', 'todos'],
     },
     motto: {
         enabled: true,
