@@ -79,26 +79,33 @@ Save trigger/no-trigger examples AND observed failure modes — you will need bo
 ### Phase 3 — Cross-Agent Wiring
 
 <HARD-GATE>
-Every skill MUST be discoverable by all three agents. Run these commands from the repo root before marking this phase complete:
+Every skill MUST be discoverable by all three agents. Before creating any symlinks, check the existing wiring pattern:
 
 ```bash
-SKILL_DIR=".vibe/skills/<name>"
+# Step 1: Check if platform dirs are already directory-level symlinks
+file .claude/skills .codex/skills .gemini/skills
+```
 
-# Surface to each CLI's skill discovery path
+- **If directory-level symlinks exist** (e.g., `.claude/skills -> ../.vibe/skills`): your skill is already discoverable. Do NOT create per-skill symlinks — they will create broken nested links inside the skill directory.
+- **If no directory-level symlinks exist**: create per-skill symlinks:
+
+```bash
 mkdir -p .claude/skills .codex/skills .gemini/skills
 ln -sf ../../.vibe/skills/<name> .claude/skills/<name>
 ln -sf ../../.vibe/skills/<name> .codex/skills/<name>
 ln -sf ../../.vibe/skills/<name> .gemini/skills/<name>
 ```
 
-Verify: `ls -la .claude/skills/<name>/` must show SKILL.md.
+Verify: `test -f .claude/skills/<name>/SKILL.md && echo "discoverable"` must print "discoverable".
+DO NOT skip the wiring check even if you assume the pattern from the template. Repos diverge from templates.
 </HARD-GATE>
 
-11. [ ] Symlinks created and verified.
+11. [ ] Wiring pattern checked and skill discoverability verified.
+12. [ ] **Register in reference lists** — Add `@import` references for the new skill in ALL context files that maintain a skill reference list (e.g., `VIBE.md`, `skills/VIBE.md`). Grep for `Skill References` to find them. Agents will not discover the skill through progressive disclosure if it is not listed.
 
 ### Phase 4 — Validate
 
-12. [ ] **Trigger evals** — create `evals/trigger-eval.json` using examples from Phase 0:
+13. [ ] **Trigger evals** — create `evals/trigger-eval.json` using examples from Phase 0:
 
 ```json
 [
@@ -107,9 +114,9 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md.
 ]
 ```
 
-13. [ ] **Self-test**: Invoke the skill with one should-trigger prompt. Confirm output follows the checklist.
-14. [ ] **Pressure test** — re-run the self-test under combined pressure (add "this is urgent", "we already did X", "just skip that step this time"). The skill MUST hold. If the agent rationalizes past a HARD-GATE under pressure, add an explicit counter to that HARD-GATE.
-15. [ ] **Lint** — verify SKILL.md has:
+14. [ ] **Self-test**: Invoke the skill with one should-trigger prompt. Confirm output follows the checklist.
+15. [ ] **Pressure test** — re-run the self-test under combined pressure (add "this is urgent", "we already did X", "just skip that step this time"). The skill MUST hold. If the agent rationalizes past a HARD-GATE under pressure, add an explicit counter to that HARD-GATE.
+16. [ ] **Lint** — verify SKILL.md has:
     - [ ] YAML frontmatter with `name` (≤ 64 chars) and `description` (≤ 1024 chars)
     - [ ] `TRIGGER when:` and `DO NOT TRIGGER when:` in the description
     - [ ] All required sections present
@@ -117,8 +124,8 @@ Verify: `ls -la .claude/skills/<name>/` must show SKILL.md.
     - [ ] At least one `<HARD-GATE>` if the skill has destructive or external-state-dependent steps; gate text names the rationalization it blocks
     - [ ] At least one Anti-Pattern entry
     - [ ] No time-sensitive content (dates, version numbers, external URLs in body text)
-16. [ ] **Commit**: `git add .vibe/skills/<name>/ && git commit -m "feat(skills): add <name> skill"`
-17. [ ] **Package** *(optional)*: `python -m scripts.package_skill .vibe/skills/<name>` to produce a distributable `.skill` ZIP.
+17. [ ] **Commit**: `git add .vibe/skills/<name>/ && git commit -m "feat(skills): add <name> skill"`
+18. [ ] **Package** *(optional)*: `python -m scripts.package_skill .vibe/skills/<name>` to produce a distributable `.skill` ZIP.
 
 ---
 
@@ -186,6 +193,8 @@ DO NOT proceed until this condition is satisfied.
 - **HARD-GATEs without rationalization counters**: A gate that just says "complete this step" will be rationalized away. Name the specific excuse it blocks: `"DO NOT skip this even if the previous step seemed to cover it"`.
 - **Testing only under ideal conditions**: If the skill hasn't been tested with urgency, sunk-cost, or authority pressure, it hasn't been fully tested. Real agents skip steps when pressured — the skill must hold.
 - **Time-sensitive content**: Embedding dates, version numbers, or ephemeral URLs in SKILL.md creates maintenance debt. Put evergreen principles in the body; access volatile data through scripts or tools.
+- **Following template commands without checking existing conventions**: The Phase 3 template provides generic `ln -sf` commands, but many repos use directory-level symlinks that make per-skill links unnecessary (and harmful — they create broken nested links). Always run `file .claude/skills` to check the actual wiring pattern before executing symlink commands.
+- **Forgetting to register in reference lists**: Creating the skill files but not adding `@import` references in context files (`VIBE.md`, `skills/VIBE.md`) leaves the skill invisible to progressive disclosure. Grep for `Skill References` and update every list that tracks skills.
 
 ---
 
