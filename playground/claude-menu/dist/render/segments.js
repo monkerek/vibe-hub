@@ -16,12 +16,11 @@ function renderProject(ctx) {
     const cwd = ctx.cwd || ctx.stdin.cwd;
     if (!cwd)
         return undefined;
-    const parts = cwd.split('/');
-    // Show last 2 path components
-    const short = parts.length > 2
+    // Filter empty strings so leading '/' doesn't inflate the count
+    const parts = cwd.split('/').filter(Boolean);
+    return parts.length > 2
         ? `…/${parts.slice(-2).join('/')}`
         : cwd;
-    return short;
 }
 function renderGit(ctx) {
     const g = ctx.git;
@@ -159,15 +158,18 @@ const RENDERERS = {
 };
 export function buildSegments(ctx) {
     const segments = [];
+    const seen = new Set();
     for (const name of ctx.config.layout.segments) {
+        if (seen.has(name))
+            continue;
+        seen.add(name);
         const renderer = RENDERERS[name];
         if (!renderer)
             continue;
         const text = renderer(ctx);
         if (!text)
             continue;
-        const style = resolveSegmentStyle(ctx.config.theme, name);
-        segments.push({ name, text, style });
+        segments.push({ name, text, style: resolveSegmentStyle(ctx.config.theme, name) });
     }
     return segments;
 }

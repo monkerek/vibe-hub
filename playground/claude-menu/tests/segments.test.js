@@ -77,12 +77,12 @@ describe('buildSegments', () => {
       assert.equal(segs[0].text, '/foo');
     });
 
-    it('shows shortened path when 2 components (leading / creates 3 parts)', () => {
-      // '/foo/bar'.split('/') = ['', 'foo', 'bar'] → length 3 → shortened
+    it('does NOT shorten 2-component absolute path (/foo/bar)', () => {
+      // Empty string from split is filtered out, so ['foo', 'bar'] → 2 parts → no ellipsis
       const segs = buildWith({ cwd: '/foo/bar' }, ['project']);
       assert.equal(segs.length, 1);
-      assert.ok(segs[0].text.startsWith('…/'));
-      assert.ok(segs[0].text.includes('foo/bar'));
+      assert.equal(segs[0].text, '/foo/bar');
+      assert.ok(!segs[0].text.startsWith('…/'));
     });
 
     it('uses ctx.cwd over stdin.cwd', () => {

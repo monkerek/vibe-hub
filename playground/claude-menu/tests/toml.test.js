@@ -106,6 +106,20 @@ segments = ["git", "model"]  # reduced set
     assert.deepEqual(cfg.layout.segments, ['git', 'model']);
   });
 
+  it('parses array of quoted strings containing commas as 2 items not 3', async () => {
+    // Old parser did inner.split(',') which splits the comma INSIDE "motto,model"
+    // producing ["\"motto", "model\"", "\"git\""] (3 broken items).
+    // Fixed parser scans quoted tokens, preserving commas inside quotes.
+    await writeConfig(`
+[layout]
+segments = ["motto,model", "git"]
+`);
+    const cfg = await loadConfig();
+    assert.equal(cfg.layout.segments.length, 2, 'should be 2 items, not 3 split on the inner comma');
+    assert.equal(cfg.layout.segments[0], 'motto,model');
+    assert.equal(cfg.layout.segments[1], 'git');
+  });
+
   it('preserves # inside a quoted string value', async () => {
     await writeConfig(`
 [motto]

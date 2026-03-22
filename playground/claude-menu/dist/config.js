@@ -177,12 +177,41 @@ function parseTomlValue(raw) {
     // Number
     if (/^-?\d+(\.\d+)?$/.test(raw))
         return Number(raw);
-    // Inline array
+    // Inline array — scan tokens to avoid splitting on commas inside quoted strings
     if (raw.startsWith('[') && raw.endsWith(']')) {
         const inner = raw.slice(1, -1).trim();
         if (!inner)
             return [];
-        return inner.split(',').map(s => parseTomlValue(s.trim()));
+        const items = [];
+        let i = 0;
+        while (i < inner.length) {
+            // skip whitespace and separating commas
+            if (inner[i] === ' ' || inner[i] === '\t' || inner[i] === ',') {
+                i++;
+                continue;
+            }
+            // quoted string — scan to matching close quote respecting backslash escapes
+            if (inner[i] === '"' || inner[i] === "'") {
+                const q = inner[i];
+                let j = i + 1;
+                while (j < inner.length && inner[j] !== q) {
+                    if (inner[j] === '\\')
+                        j++; // skip next char (escape)
+                    j++;
+                }
+                items.push(parseTomlValue(inner.slice(i, j + 1)));
+                i = j + 1;
+            }
+            else {
+                // bare value (bool, number, identifier) — ends at comma or end of string
+                const end = inner.indexOf(',', i);
+                const token = end !== -1 ? inner.slice(i, end).trim() : inner.slice(i).trim();
+                if (token)
+                    items.push(parseTomlValue(token));
+                i = end !== -1 ? end + 1 : inner.length;
+            }
+        }
+        return items;
     }
     return raw;
 }
