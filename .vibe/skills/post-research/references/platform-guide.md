@@ -77,10 +77,10 @@ Example: `twitter-karpathy-diffusion-models-digest-20260321.md`
 
 **Tier 0 — `redbook` CLI (preferred when authenticated)**:
 ```bash
-redbook read <url>          # read note by URL
-redbook whoami              # verify auth status
+bash .vibe/skills/post-research/scripts/redbook-check.sh   # verify auth
+bash .vibe/skills/post-research/scripts/redbook-read.sh <url> --json
 ```
-Install: `npm install -g @lucasygu/redbook`. Requires one-time browser cookie setup. When authenticated, this is the most reliable method — bypasses all proxy blocks.
+Install: `npm install -g @lucasygu/redbook`. Requires one-time cookie setup — see `references/redbook-setup.md`. The wrapper scripts resolve cookies from `$XHS_COOKIE_STRING` env var or `~/.config/redbook/cookie-string` file. When authenticated, this is the most reliable method — bypasses all proxy blocks.
 
 **Proxy tiers (Tier 1–4)**: Best-effort only. Xiaohongshu is mobile-first and login-encouraged; proxy services are frequently blocked (403).
 - Jina Reader can sometimes extract caption text for public posts.

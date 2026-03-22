@@ -71,3 +71,6 @@ In all three cases, report the specific failure reason and stop.
 
 - **`references/platform-guide.md`**: Per-platform fetch behavior, known limitations, and URL patterns for Twitter/X, Red Note, and tech blogs.
 - **`references/templates.md`**: Digest templates for each content shape (single post, thread, long-form article).
+- **`references/redbook-setup.md`**: One-time setup guide for `redbook` CLI auth (cookie extraction for Red Note Tier 0).
+- **`scripts/redbook-read.sh`**: Wrapper for `redbook read` — resolves cookies from env var or config file automatically.
+- **`scripts/redbook-check.sh`**: Auth health check — run before Tier 0 attempts.
