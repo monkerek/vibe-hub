@@ -28,7 +28,7 @@ rounded = true            # Rounded caps on each bar (requires Nerd Font)
 # segments: ordered list of what to show
 [layout]
 mode = "expanded"
-segments = ["motto", "project", "git", "model", "context", "time"]
+segments = ["motto", "project", "git", "model", "context", "time", "tools", "agents", "todos"]
 
 # Available segments:
 #   motto       — Dynamic motto / status message

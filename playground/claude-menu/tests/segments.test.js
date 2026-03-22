@@ -297,7 +297,7 @@ describe('buildSegments', () => {
     it('shows both running and completed together', () => {
       const segs = buildWith({
         tools: [
-          { name: 'Bash', status: 'running', count: 1 },
+          { name: 'Bash', status: 'running', count: 0 },  // running, no prior completions
           { name: 'Read', status: 'completed', count: 2 },
         ],
       }, ['tools']);
