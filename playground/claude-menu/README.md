@@ -41,11 +41,14 @@ Edit `~/.claude/settings.json` and add or update the `statusLine` field with the
 
 ```json
 {
-  "statusLine": "node /absolute/path/to/claude-menu/dist/index.js"
+  "statusLine": {
+    "type": "command",
+    "command": "node /absolute/path/to/claude-menu/dist/index.js"
+  }
 }
 ```
 
-To get the absolute path automatically:
+To get the correct `command` value, run this **from inside the `claude-menu` directory**:
 
 ```bash
 echo "node $(pwd)/dist/index.js"

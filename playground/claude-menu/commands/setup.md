@@ -57,7 +57,10 @@ Add or update only the `statusLine` field — preserve all other existing fields
 
 ```json
 {
-  "statusLine": "node DIST"
+  "statusLine": {
+    "type": "command",
+    "command": "node DIST"
+  }
 }
 ```
 
