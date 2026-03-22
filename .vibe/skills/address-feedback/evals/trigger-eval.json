@@ -1,0 +1,12 @@
+[
+  {"query": "address the PR feedback from the reviewer", "should_trigger": true},
+  {"query": "fix the review comments on my pull request", "should_trigger": true},
+  {"query": "respond to the code review suggestions", "should_trigger": true},
+  {"query": "handle the requested changes from the PR review", "should_trigger": true},
+  {"query": "the reviewer asked me to refactor this function, help me address it", "should_trigger": true},
+  {"query": "review this pull request for issues", "should_trigger": false},
+  {"query": "write a code review for this diff", "should_trigger": false},
+  {"query": "create a new pull request", "should_trigger": false},
+  {"query": "summarize what this PR does", "should_trigger": false},
+  {"query": "help me write better code", "should_trigger": false}
+]
