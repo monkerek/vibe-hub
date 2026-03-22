@@ -11,10 +11,14 @@ All fetch attempts follow this priority order, mirroring the `web-fetcher` skill
 | Tier | Service | URL Pattern | Notes |
 |---|---|---|---|
 | 1 | **Jina Reader** | `https://r.jina.ai/<url>` | Best Markdown quality; use `Accept: text/markdown` header. Free tier: 100 RPM. |
-| 2 | **defuddle.md** | `https://defuddle.md/<url>` | Good fallback for structured articles; less reliable on SPAs. |
-| 3 | **markdown.new** | `https://markdown.new/<url>` | Last-resort converter; output quality varies. |
+| 2 | **twitter-thread.com** *(Twitter/X only)* | `https://twitter-thread.com/t/<tweet-id>` | Public thread reader; extract tweet ID from URL. |
+| 3 | **defuddle.md** | `https://defuddle.md/<url>` | Good fallback for structured articles; less reliable on SPAs. |
+| 4 | **markdown.new** | `https://markdown.new/<url>` | Last-resort converter; output quality varies. |
+| 5 | **WebSearch** | `WebSearch` tool with author + topic keywords | Use when all proxy tiers fail. Synthesize from indexed snippets + linked sources. Works well for widely-discussed posts; unreliable for obscure or very recent content. |
 
-Stop at the first tier that returns ≥ 100 characters without auth-wall signals. If all three fail, report all errors and do not proceed — raw HTML is not acceptable input for digest synthesis.
+Stop at the first tier that returns ≥ 100 characters without auth-wall signals. If all tiers including WebSearch fail, report all errors and stop.
+
+**Environment note**: In restricted/headless environments, proxy tiers 1–4 may all return 403 due to IP or User-Agent blocking. In this case, Tier 5 (`WebSearch`) is the primary fallback. Document the fetch method used in the digest metadata.
 
 **API key note**: Jina Reader's free tier may rate-limit or return 403 in high-traffic environments. For production use, pass an `Authorization: Bearer <token>` header to increase limits to 500 RPM.
 
@@ -43,11 +47,18 @@ Auth-wall signal: response contains `"Sign in to X"` or `"Log in"` — treat as 
 - Fetch each subsequent tweet URL individually and concatenate before synthesizing.
 - Cap at 20 tweets per thread to avoid runaway fetching.
 
+### WebSearch Fallback (Tier 5) for Twitter
+- Search by **author + topic keywords**, not by tweet ID — ID-only searches rarely surface exact content
+- Example: `"karpathy vibe coding twitter"` >> `"karpathy status 1886192184808149383"`
+- Works best for viral tweets that have been quoted, retweeted, or written about
+- Obscure or very recent tweets (< 48h) may not be indexed yet
+
 ### Known Limitations
 - Sensitive/NSFW content behind age gate: not fetchable
 - Private accounts: not fetchable
 - Deleted tweets: Jina may return cached content or 404
 - Quote tweets: the quoted content may appear truncated
+- All proxy tiers (1–4) return 403 in restricted/headless environments — Tier 5 is the real fallback
 
 ### Digest Naming
 `twitter-<handle>-<topic-slug>-digest-YYYYMMDD.md`

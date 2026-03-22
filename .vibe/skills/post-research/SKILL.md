@@ -7,7 +7,7 @@ description: Transforms social media posts and tech blog articles into structure
 
 ## Overview
 
-This skill fetches and transforms short-form web content — tweets/X threads, Red Note (小红书) posts, and tech blog articles — into structured, reusable digests. It uses a 3-tier fallback chain (Jina Reader → defuddle.md → markdown.new) to extract clean Markdown, mirroring the `web-fetcher` skill's strategy. Output is saved to `digest/posts/`.
+This skill fetches and transforms short-form web content — tweets/X threads, Red Note (小红书) posts, and tech blog articles — into structured, reusable digests. It uses a 5-tier fallback chain (Jina Reader → twitter-thread.com → defuddle.md → markdown.new → WebSearch) to extract clean Markdown. Output is saved to `digest/posts/`.
 
 ## 📦 Dependencies
 
@@ -26,7 +26,8 @@ You MUST follow this checklist for every post research task:
    - **Tier 1 — Jina Reader**: `r.jina.ai/<url>` with header `Accept: text/markdown`
    - **Tier 2 — twitter-thread.com** *(Twitter/X only)*: `https://twitter-thread.com/t/<tweet-id>` (public thread reader; extract the tweet ID from the original URL)
    - **Tier 3 — defuddle.md**: `defuddle.md/<url>` (fallback if prior tiers fail or return < 100 chars)
-   - **Tier 4 — markdown.new**: `markdown.new/<url>` (last resort)
+   - **Tier 4 — markdown.new**: `markdown.new/<url>` (last resort for direct fetch)
+   - **Tier 5 — WebSearch**: Search `<author> <topic keywords> <platform>` using the `WebSearch` tool. Synthesize from indexed snippets and linked sources. For Twitter, search by topic/author — not by tweet ID alone. Document in digest metadata that content was recovered via search.
    - If all tiers fail, report all errors and stop — do NOT attempt raw HTML as the digest would be unusable.
 3. [ ] **Auth Wall Check**: Scan the fetched content for auth-wall signals (`sign in`, `log in`, `create account`, `verify you are human`). If detected, stop and report the failure — do NOT proceed with partial content.
 4. [ ] **Detect Language**: Identify the primary language of the content (en, zh, etc.) and note it in the digest metadata.
