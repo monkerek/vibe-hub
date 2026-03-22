@@ -1,0 +1,14 @@
+[
+  {"query": "review PR #42 before I merge it", "should_trigger": true},
+  {"query": "run a code review on my changes", "should_trigger": true},
+  {"query": "review my diff", "should_trigger": true},
+  {"query": "code review this pull request", "should_trigger": true},
+  {"query": "check my changes before merging", "should_trigger": true},
+  {"query": "review PR #7 and post inline comments", "should_trigger": true},
+  {"query": "write a new feature for user auth", "should_trigger": false},
+  {"query": "create a pull request for my branch", "should_trigger": false},
+  {"query": "explain what PR #42 does", "should_trigger": false},
+  {"query": "summarize the changes in this PR", "should_trigger": false},
+  {"query": "research this GitHub repo", "should_trigger": false},
+  {"query": "what did I change in the last commit", "should_trigger": false}
+]
