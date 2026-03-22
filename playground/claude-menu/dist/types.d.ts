@@ -1,0 +1,113 @@
+export interface StdinData {
+    model?: {
+        display_name?: string;
+        api_model_id?: string;
+    };
+    context_window?: {
+        current_usage?: {
+            input_tokens?: number;
+            output_tokens?: number;
+            cache_creation_input_tokens?: number;
+            cache_read_input_tokens?: number;
+        };
+        context_window_size?: number;
+        used_percentage?: number;
+        remaining_percentage?: number;
+    };
+    session?: {
+        id?: string;
+        transcript_path?: string;
+    };
+    cwd?: string;
+}
+export interface ToolEntry {
+    name: string;
+    status: 'running' | 'completed' | 'error';
+    count: number;
+}
+export interface AgentEntry {
+    type: string;
+    model?: string;
+    description?: string;
+    status: 'running' | 'completed';
+    durationMs?: number;
+}
+export interface TodoItem {
+    content: string;
+    status: 'pending' | 'in_progress' | 'completed';
+}
+export interface UsageData {
+    fiveHourUsage?: number;
+    fiveHourLimit?: number;
+    sevenDayUsage?: number;
+    sevenDayLimit?: number;
+    resetAt?: string;
+}
+export interface GitStatus {
+    branch: string;
+    dirty: boolean;
+    ahead: number;
+    behind: number;
+    modified: number;
+    added: number;
+    deleted: number;
+    untracked: number;
+}
+export type MottoStrategy = 'day-of-week' | 'random' | 'sequential' | 'manual' | 'time-of-day';
+export interface MottoConfig {
+    enabled: boolean;
+    strategy: MottoStrategy;
+    current?: string;
+    pack?: string;
+    custom?: string[];
+    dayOfWeek?: Record<string, string>;
+    timeOfDay?: Record<string, string>;
+    emoji?: boolean;
+}
+export type BuiltinTheme = 'pastel-rainbow' | 'claude-orange' | 'nord-frost' | 'dracula' | 'catppuccin' | 'monochrome';
+export interface SegmentStyle {
+    fg: string;
+    bg: string;
+    icon?: string;
+}
+export interface ThemeConfig {
+    name: BuiltinTheme | string;
+    separator?: string;
+    segments?: Record<string, Partial<SegmentStyle>>;
+}
+export type SegmentName = 'motto' | 'model' | 'project' | 'git' | 'context' | 'usage' | 'tools' | 'agents' | 'todos' | 'environment' | 'time';
+export interface LayoutConfig {
+    mode: 'expanded' | 'compact';
+    segments: SegmentName[];
+}
+export interface ClaudeMenuConfig {
+    theme: ThemeConfig;
+    layout: LayoutConfig;
+    motto: MottoConfig;
+}
+export interface RenderContext {
+    stdin: StdinData;
+    git?: GitStatus;
+    usage?: UsageData;
+    tools: ToolEntry[];
+    agents: AgentEntry[];
+    todos: TodoItem[];
+    motto?: string;
+    config: ClaudeMenuConfig;
+    terminalWidth: number;
+    cwd: string;
+}
+export interface MainDeps {
+    readStdin: () => Promise<StdinData>;
+    getGitStatus: (cwd: string) => Promise<GitStatus | undefined>;
+    getUsage: () => Promise<UsageData | undefined>;
+    parseTranscript: (path: string) => Promise<{
+        tools: ToolEntry[];
+        agents: AgentEntry[];
+        todos: TodoItem[];
+    }>;
+    loadConfig: () => Promise<ClaudeMenuConfig>;
+    resolveMotto: (config: MottoConfig) => string | undefined;
+    render: (ctx: RenderContext) => string[];
+}
+//# sourceMappingURL=types.d.ts.map
