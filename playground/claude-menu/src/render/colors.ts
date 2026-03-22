@@ -60,7 +60,7 @@ export function visibleLength(str: string): number {
   return len;
 }
 
-function isWide(cp: number): boolean {
+export function isWide(cp: number): boolean {
   // CJK Unified Ideographs, CJK Compatibility, Hangul, Fullwidth forms, Emoji
   return (
     (cp >= 0x1100 && cp <= 0x115f) ||

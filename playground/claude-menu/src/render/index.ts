@@ -1,4 +1,4 @@
-import { fgColor, bgColor, reset, visibleLength, stripAnsi } from './colors.js';
+import { fgColor, bgColor, reset, visibleLength, stripAnsi, isWide } from './colors.js';
 import { buildSegments, type RenderedSegment } from './segments.js';
 import { getThemeSeparator } from '../config.js';
 import type { RenderContext } from '../types.js';
@@ -6,6 +6,10 @@ import type { RenderContext } from '../types.js';
 // Nerd Font powerline rounded cap glyphs (U+E0B6 / U+E0B4)
 const ROUND_LEFT  = '\ue0b6';
 const ROUND_RIGHT = '\ue0b4';
+
+// Expanded mode segment groups — controls which line each segment appears on
+const PRIMARY_SEGMENTS  = new Set(['motto', 'project', 'git', 'model', 'context', 'time']);
+const ACTIVITY_SEGMENTS = new Set(['tools', 'agents', 'todos', 'usage', 'environment']);
 
 // ─── Powerline rendering ────────────────────────────────────────────────────
 
@@ -20,11 +24,10 @@ function renderPowerlineSegment(
   const icon = style.icon ? `${style.icon} ` : '';
   const content = ` ${icon}${text} `;
 
-  // Segment body: fg on bg
   let out = bgColor(style.bg) + fgColor(style.fg) + content;
 
   if (rounded && isLast) {
-    // Right rounded cap: draw in segment's bg color on terminal default bg
+    // Right rounded cap: segment bg drawn on terminal default bg (Nerd Font convention)
     out += reset() + fgColor(style.bg) + ROUND_RIGHT + reset();
   } else if (nextBg) {
     out += bgColor(nextBg) + fgColor(style.bg) + separator;
@@ -40,7 +43,7 @@ function renderPowerline(segments: RenderedSegment[], separator: string, rounded
 
   let line = '';
 
-  // Left rounded cap: draw in first segment's bg color on terminal default bg
+  // Left rounded cap: segment bg drawn on terminal default bg (Nerd Font convention)
   if (rounded) {
     line += reset() + fgColor(segments[0].style.bg) + ROUND_LEFT;
   }
@@ -65,16 +68,12 @@ function renderCompact(segments: RenderedSegment[], separator: string, rounded: 
 function renderExpanded(segments: RenderedSegment[], separator: string, rounded: boolean, maxWidth: number): string[] {
   const lines: string[] = [];
 
-  // Primary line: motto + project + git + model + context + time
-  const primaryNames = new Set(['motto', 'project', 'git', 'model', 'context', 'time']);
-  const primary = segments.filter(s => primaryNames.has(s.name));
+  const primary = segments.filter(s => PRIMARY_SEGMENTS.has(s.name));
   if (primary.length > 0) {
     lines.push(renderPowerline(primary, separator, rounded));
   }
 
-  // Activity line: tools + agents + todos + usage + environment
-  const activityNames = new Set(['tools', 'agents', 'todos', 'usage', 'environment']);
-  const activity = segments.filter(s => activityNames.has(s.name));
+  const activity = segments.filter(s => ACTIVITY_SEGMENTS.has(s.name));
   if (activity.length > 0) {
     lines.push(renderPowerline(activity, separator, rounded));
   }
@@ -113,21 +112,6 @@ function truncateAnsi(str: string, maxWidth: number): string {
   }
 
   return result;
-}
-
-function isWide(cp: number): boolean {
-  return (
-    (cp >= 0x1100 && cp <= 0x115f) ||
-    (cp >= 0x2e80 && cp <= 0x9fff) ||
-    (cp >= 0xac00 && cp <= 0xd7af) ||
-    (cp >= 0xf900 && cp <= 0xfaff) ||
-    (cp >= 0xfe10 && cp <= 0xfe6f) ||
-    (cp >= 0xff01 && cp <= 0xff60) ||
-    (cp >= 0xffe0 && cp <= 0xffe6) ||
-    (cp >= 0x1f000 && cp <= 0x1ffff) ||
-    (cp >= 0x20000 && cp <= 0x2ffff) ||
-    (cp >= 0x30000 && cp <= 0x3ffff)
-  );
 }
 
 // ─── Public API ─────────────────────────────────────────────────────────────
