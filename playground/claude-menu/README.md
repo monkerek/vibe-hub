@@ -51,19 +51,15 @@ To get the absolute path automatically:
 echo "node $(pwd)/dist/index.js"
 ```
 
-### 4. Create your config directory
+### 4. Install the config
+
+Create the config directory and copy the example config in one step:
 
 ```bash
-mkdir -p ~/.claude/plugins/claude-menu
+mkdir -p ~/.claude/plugins/claude-menu && cp config.example.toml ~/.claude/plugins/claude-menu/config.toml
 ```
 
-### 5. Copy the example config
-
-```bash
-cp config.example.toml ~/.claude/plugins/claude-menu/config.toml
-```
-
-### 6. Restart Claude Code
+### 5. Restart Claude Code
 
 The statusline is rendered each time Claude Code refreshes the UI. Restart the CLI (or reload the window if using the IDE extension) to see your new statusline.
 
@@ -112,9 +108,12 @@ separator = ""            # Powerline glyph. Try "" (thin), "│", or ""
 
 #### Per-segment color overrides
 
-Any segment's `fg`, `bg`, or `icon` can be overridden independently:
+Any segment's `fg`, `bg`, or `icon` can be overridden independently without changing the rest of the theme:
 
 ```toml
+[theme]
+name = "dracula"   # base theme
+
 [theme.segments.motto]
 fg = "#1e1e2e"
 bg = "#a6e3a1"
@@ -125,6 +124,51 @@ fg = "#ffffff"
 bg = "#ea580c"
 icon = "🧠"
 ```
+
+#### Building a fully custom theme
+
+Set `name` to any string that is **not** a built-in theme name. All segments will start from a neutral fallback (`fg = "#ffffff"`, `bg = "#555555"`), and you define each segment's colors yourself:
+
+```toml
+[theme]
+name = "my-theme"
+separator = "│"
+rounded = false
+
+[theme.segments.motto]
+fg = "#0d1117"
+bg = "#58a6ff"
+icon = "⚡"
+
+[theme.segments.model]
+fg = "#0d1117"
+bg = "#3fb950"
+icon = "🧠"
+
+[theme.segments.project]
+fg = "#0d1117"
+bg = "#d2a8ff"
+icon = "📂"
+
+[theme.segments.git]
+fg = "#0d1117"
+bg = "#ffa657"
+icon = "⎇"
+
+[theme.segments.context]
+fg = "#0d1117"
+bg = "#79c0ff"
+icon = "◼"
+
+[theme.segments.time]
+fg = "#0d1117"
+bg = "#56d364"
+icon = "⏱"
+```
+
+You only need to define the segments you actually use (see the `[layout] segments` list). Segments omitted from `[theme.segments.*]` will use the neutral fallback colors.
+
+**Color format:** hex `#rrggbb` only. Both `fg` (text) and `bg` (background) are required per segment for a fully custom theme.
 
 ---
 
