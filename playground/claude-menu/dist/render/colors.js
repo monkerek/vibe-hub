@@ -31,7 +31,7 @@ export function stripAnsi(str) {
     return str.replace(/\x1b\[[0-9;]*m/g, '');
 }
 // Reuse a single Segmenter instance across all visibleLength calls
-const GRAPHEME_SEGMENTER = typeof Intl !== 'undefined' && Intl.Segmenter
+export const GRAPHEME_SEGMENTER = typeof Intl !== 'undefined' && Intl.Segmenter
     ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
     : null;
 export function visibleLength(str) {

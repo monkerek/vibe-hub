@@ -104,7 +104,6 @@ export const DEFAULT_CONFIG = {
 function parseToml(text) {
     const result = {};
     let currentSection = result;
-    let currentKey = '';
     for (const rawLine of text.split('\n')) {
         const line = rawLine.trim();
         if (!line || line.startsWith('#'))
@@ -121,7 +120,6 @@ function parseToml(text) {
                 target = target[part];
             }
             currentSection = target;
-            currentKey = '';
             continue;
         }
         // key = value
@@ -163,11 +161,32 @@ function extractTomlValue(raw) {
     // Bare value (boolean, number, unquoted string): stop at whitespace or #
     return raw.split(/[\s#]/)[0] ?? raw;
 }
+function unescapeTomlString(s) {
+    // Single-pass replacement prevents the multi-pass bug where replacing \\
+    // first (e.g. \\ → \) and then \t (\t → tab) would incorrectly transform
+    // the output of the first pass (e.g. \\t → \ → \t → tab).
+    return s.replace(/\\(["\\ntr]|u[0-9a-fA-F]{4})/g, (_, esc) => {
+        if (esc === '"')
+            return '"';
+        if (esc === '\\')
+            return '\\';
+        if (esc === 'n')
+            return '\n';
+        if (esc === 't')
+            return '\t';
+        if (esc === 'r')
+            return '\r';
+        return String.fromCharCode(parseInt(esc.slice(1), 16)); // \uXXXX
+    });
+}
 function parseTomlValue(raw) {
-    // String (double or single quoted)
-    if ((raw.startsWith('"') && raw.endsWith('"')) ||
-        (raw.startsWith("'") && raw.endsWith("'"))) {
-        return raw.slice(1, -1).replace(/\\n/g, '\n').replace(/\\t/g, '\t');
+    // Double-quoted string: apply TOML escape sequences
+    if (raw.startsWith('"') && raw.endsWith('"')) {
+        return unescapeTomlString(raw.slice(1, -1));
+    }
+    // Single-quoted string: literal — no escape processing
+    if (raw.startsWith("'") && raw.endsWith("'")) {
+        return raw.slice(1, -1);
     }
     // Boolean
     if (raw === 'true')

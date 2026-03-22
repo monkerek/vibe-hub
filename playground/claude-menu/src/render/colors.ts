@@ -40,7 +40,7 @@ export function stripAnsi(str: string): string {
 }
 
 // Reuse a single Segmenter instance across all visibleLength calls
-const GRAPHEME_SEGMENTER: Intl.Segmenter | null =
+export const GRAPHEME_SEGMENTER: Intl.Segmenter | null =
   typeof Intl !== 'undefined' && Intl.Segmenter
     ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
     : null;

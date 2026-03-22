@@ -17,16 +17,27 @@ async function getCredentials() {
         return undefined;
     }
 }
+function isValidCachedUsage(v) {
+    if (!v || typeof v !== 'object')
+        return false;
+    const c = v;
+    if (typeof c['timestamp'] !== 'number')
+        return false;
+    const d = c['data'];
+    if (!d || typeof d !== 'object')
+        return false;
+    return true;
+}
 async function readCache() {
     try {
         const raw = await readFile(getCachePath(), 'utf-8');
         const cached = JSON.parse(raw);
-        if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
+        if (isValidCachedUsage(cached) && Date.now() - cached.timestamp < CACHE_TTL_MS) {
             return cached;
         }
     }
     catch {
-        // no cache or invalid
+        // no cache or invalid JSON
     }
     return undefined;
 }

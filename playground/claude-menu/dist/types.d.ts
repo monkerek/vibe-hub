@@ -36,6 +36,12 @@ export interface TodoItem {
     content: string;
     status: 'pending' | 'in_progress' | 'completed';
 }
+export interface EnvironmentInfo {
+    claudeMdCount: number;
+    rulesCount: number;
+    mcpCount: number;
+    hooksCount: number;
+}
 export interface UsageData {
     fiveHourUsage?: number;
     fiveHourLimit?: number;
@@ -90,6 +96,7 @@ export interface RenderContext {
     stdin: StdinData;
     git?: GitStatus;
     usage?: UsageData;
+    environment?: EnvironmentInfo;
     tools: ToolEntry[];
     agents: AgentEntry[];
     todos: TodoItem[];
@@ -102,6 +109,7 @@ export interface MainDeps {
     readStdin: () => Promise<StdinData>;
     getGitStatus: (cwd: string) => Promise<GitStatus | undefined>;
     getUsage: () => Promise<UsageData | undefined>;
+    getEnvironment: (cwd: string) => Promise<EnvironmentInfo>;
     parseTranscript: (path: string) => Promise<{
         tools: ToolEntry[];
         agents: AgentEntry[];

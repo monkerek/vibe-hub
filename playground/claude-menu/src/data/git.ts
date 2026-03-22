@@ -18,7 +18,7 @@ export async function getGitStatus(cwd: string): Promise<GitStatus | undefined> 
   if (!branch) return undefined;
 
   const [statusRaw, aheadBehind] = await Promise.all([
-    git(['status', '--porcelain', '-u'], cwd),
+    git(['status', '--porcelain', '-ushort'], cwd),
     git(['rev-list', '--left-right', '--count', `HEAD...@{upstream}`], cwd),
   ]);
 

@@ -1,4 +1,4 @@
-import { fgColor, bgColor, reset, visibleLength, isWide } from './colors.js';
+import { fgColor, bgColor, reset, visibleLength, isWide, GRAPHEME_SEGMENTER } from './colors.js';
 import { buildSegments } from './segments.js';
 import { getThemeSeparator } from '../config.js';
 // Nerd Font powerline rounded cap glyphs (U+E0B6 / U+E0B4)
@@ -50,41 +50,68 @@ function renderExpanded(segments, separator, rounded, maxWidth) {
     const lines = [];
     const primary = segments.filter(s => PRIMARY_SEGMENTS.has(s.name));
     if (primary.length > 0) {
-        lines.push(renderPowerline(primary, separator, rounded));
+        lines.push(truncateAnsi(renderPowerline(primary, separator, rounded), maxWidth));
     }
     const activity = segments.filter(s => ACTIVITY_SEGMENTS.has(s.name));
     if (activity.length > 0) {
-        lines.push(renderPowerline(activity, separator, rounded));
+        lines.push(truncateAnsi(renderPowerline(activity, separator, rounded), maxWidth));
     }
     return lines;
 }
 // ─── ANSI-aware truncation ──────────────────────────────────────────────────
+// Split a string into alternating ANSI-escape and visible-text tokens.
+const ANSI_RE = /\x1b\[[0-9;]*m/g;
 function truncateAnsi(str, maxWidth) {
     if (visibleLength(str) <= maxWidth)
         return str;
+    // Tokenise: split into ANSI escape sequences and visible text runs.
+    // Then segment each visible run by grapheme cluster so that multi-codepoint
+    // sequences (e.g. emoji + skin-tone modifier) are measured and cut atomically.
     let visible = 0;
     let result = '';
-    let inEsc = false;
-    for (const char of str) {
-        if (char === '\x1b') {
-            inEsc = true;
-            result += char;
-            continue;
+    let last = 0;
+    ANSI_RE.lastIndex = 0;
+    let m;
+    let done = false;
+    function consumeText(text) {
+        if (GRAPHEME_SEGMENTER) {
+            for (const seg of GRAPHEME_SEGMENTER.segment(text)) {
+                const cp = seg.segment.codePointAt(0) || 0;
+                const w = isWide(cp) ? 2 : 1;
+                if (visible + w > maxWidth - 1) {
+                    result += '…' + reset();
+                    return true; // done
+                }
+                visible += w;
+                result += seg.segment;
+            }
         }
-        if (inEsc) {
-            result += char;
-            if (char === 'm')
-                inEsc = false;
-            continue;
+        else {
+            for (const char of text) {
+                const cp = char.codePointAt(0) || 0;
+                const w = isWide(cp) ? 2 : 1;
+                if (visible + w > maxWidth - 1) {
+                    result += '…' + reset();
+                    return true;
+                }
+                visible += w;
+                result += char;
+            }
         }
-        const cp = char.codePointAt(0) || 0;
-        const w = isWide(cp) ? 2 : 1;
-        if (visible + w > maxWidth - 1) {
-            result += '…' + reset();
-            break;
+        return false;
+    }
+    while (!done && (m = ANSI_RE.exec(str)) !== null) {
+        // Visible text before this escape sequence
+        if (m.index > last) {
+            done = consumeText(str.slice(last, m.index));
         }
-        visible += w;
-        result += char;
+        if (!done)
+            result += m[0]; // re-emit the escape sequence verbatim
+        last = m.index + m[0].length;
+    }
+    // Remaining visible text after the last escape sequence
+    if (!done && last < str.length) {
+        consumeText(str.slice(last));
     }
     return result;
 }

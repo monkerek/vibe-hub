@@ -5,7 +5,11 @@ export async function readStdin() {
         process.stdin.on('data', (chunk) => {
             data += chunk;
         });
+        // Clear the timeout when stdin actually finishes — prevents the race where
+        // the timeout fires before a slow pipe delivers its data.
+        const timer = setTimeout(() => resolve({}), 500);
         process.stdin.on('end', () => {
+            clearTimeout(timer);
             try {
                 resolve(JSON.parse(data));
             }
@@ -13,8 +17,6 @@ export async function readStdin() {
                 resolve({});
             }
         });
-        // Timeout safety — don't hang if stdin is empty
-        setTimeout(() => resolve({}), 500);
     });
 }
 //# sourceMappingURL=stdin.js.map

@@ -1,13 +1,7 @@
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
-
-export interface EnvironmentInfo {
-  claudeMdCount: number;
-  rulesCount: number;
-  mcpCount: number;
-  hooksCount: number;
-}
+import type { EnvironmentInfo } from '../types.js';
 
 export async function getEnvironment(cwd: string): Promise<EnvironmentInfo> {
   const info: EnvironmentInfo = {

@@ -70,9 +70,12 @@ function renderContext(ctx: RenderContext): string | undefined {
   let percent: number;
   if (cw.used_percentage !== undefined) {
     percent = Math.round(cw.used_percentage);
-  } else if (cw.current_usage?.input_tokens && cw.context_window_size) {
+  } else if (cw.current_usage?.input_tokens !== undefined && cw.context_window_size) {
+    // Only input tokens (+ cache tokens) count against the context window.
+    // output_tokens are NOT counted — including them inflates the percentage.
     const totalUsed = (cw.current_usage.input_tokens || 0) +
-                      (cw.current_usage.output_tokens || 0);
+                      (cw.current_usage.cache_creation_input_tokens || 0) +
+                      (cw.current_usage.cache_read_input_tokens || 0);
     percent = Math.round((totalUsed / cw.context_window_size) * 100);
   } else {
     return undefined;
@@ -159,9 +162,17 @@ function renderTodos(ctx: RenderContext): string | undefined {
   return text;
 }
 
-function renderEnvironment(_ctx: RenderContext): string | undefined {
-  // TODO: implement environment data rendering
-  return undefined;
+function renderEnvironment(ctx: RenderContext): string | undefined {
+  const env = ctx.environment;
+  if (!env) return undefined;
+
+  const parts: string[] = [];
+  if (env.claudeMdCount > 0) parts.push(`md:${env.claudeMdCount}`);
+  if (env.mcpCount > 0)      parts.push(`mcp:${env.mcpCount}`);
+  if (env.hooksCount > 0)    parts.push(`hooks:${env.hooksCount}`);
+  if (env.rulesCount > 0)    parts.push(`rules:${env.rulesCount}`);
+
+  return parts.length > 0 ? parts.join(' ') : undefined;
 }
 
 function renderTime(_ctx: RenderContext): string | undefined {

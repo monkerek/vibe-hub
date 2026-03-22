@@ -26,15 +26,24 @@ async function getCredentials(): Promise<string | undefined> {
   }
 }
 
+function isValidCachedUsage(v: unknown): v is CachedUsage {
+  if (!v || typeof v !== 'object') return false;
+  const c = v as Record<string, unknown>;
+  if (typeof c['timestamp'] !== 'number') return false;
+  const d = c['data'];
+  if (!d || typeof d !== 'object') return false;
+  return true;
+}
+
 async function readCache(): Promise<CachedUsage | undefined> {
   try {
     const raw = await readFile(getCachePath(), 'utf-8');
-    const cached = JSON.parse(raw) as CachedUsage;
-    if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    const cached: unknown = JSON.parse(raw);
+    if (isValidCachedUsage(cached) && Date.now() - cached.timestamp < CACHE_TTL_MS) {
       return cached;
     }
   } catch {
-    // no cache or invalid
+    // no cache or invalid JSON
   }
   return undefined;
 }

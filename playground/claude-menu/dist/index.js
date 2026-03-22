@@ -2,6 +2,7 @@
 import { readStdin } from './data/stdin.js';
 import { getGitStatus } from './data/git.js';
 import { getUsage } from './data/usage.js';
+import { getEnvironment } from './data/environment.js';
 import { parseTranscript } from './data/transcript.js';
 import { loadConfig } from './config.js';
 import { resolveMotto } from './motto/resolver.js';
@@ -19,6 +20,7 @@ export async function main(overrides = {}) {
         readStdin,
         getGitStatus,
         getUsage,
+        getEnvironment,
         parseTranscript,
         loadConfig,
         resolveMotto,
@@ -32,9 +34,10 @@ export async function main(overrides = {}) {
     ]);
     const cwd = stdin.cwd || process.cwd();
     // Fetch all data sources in parallel
-    const [git, usage, transcript] = await Promise.all([
+    const [git, usage, environment, transcript] = await Promise.all([
         deps.getGitStatus(cwd),
         deps.getUsage(),
+        deps.getEnvironment(cwd),
         stdin.session?.transcript_path
             ? deps.parseTranscript(stdin.session.transcript_path)
             : Promise.resolve({ tools: [], agents: [], todos: [] }),
@@ -46,6 +49,7 @@ export async function main(overrides = {}) {
         stdin,
         git,
         usage,
+        environment,
         tools: transcript.tools,
         agents: transcript.agents,
         todos: transcript.todos,

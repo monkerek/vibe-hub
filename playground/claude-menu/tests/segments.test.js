@@ -206,7 +206,9 @@ describe('buildSegments', () => {
       assert.ok(segs[0].text.includes('34%'));
     });
 
-    it('calculates percent from token counts', () => {
+    it('calculates percent from input tokens only (output_tokens excluded)', () => {
+      // output_tokens do NOT count against the context window.
+      // 500 input / 1000 window = 50%, regardless of 100 output_tokens.
       const segs = buildWith({
         stdin: {
           context_window: {
@@ -216,7 +218,7 @@ describe('buildSegments', () => {
         },
       }, ['context']);
       assert.equal(segs.length, 1);
-      assert.ok(segs[0].text.includes('60%'));
+      assert.ok(segs[0].text.includes('50%'), `Expected 50%, got: ${segs[0].text}`);
     });
 
     it('includes a progress bar with block characters', () => {

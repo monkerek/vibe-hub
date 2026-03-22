@@ -51,7 +51,8 @@ function getMottoList(config: MottoConfig): string[] {
 
 function resolveByDayOfWeek(mottos: string[], config: MottoConfig): string {
   const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const today = days[new Date().getDay()];
+  const dayIndex = new Date().getDay();
+  const today = days[dayIndex];
 
   // Check explicit day-of-week mapping first
   if (config.dayOfWeek && config.dayOfWeek[today]) {
@@ -59,7 +60,6 @@ function resolveByDayOfWeek(mottos: string[], config: MottoConfig): string {
   }
 
   // Fall back to cycling through the list by day
-  const dayIndex = new Date().getDay();
   return mottos[dayIndex % mottos.length];
 }
 
