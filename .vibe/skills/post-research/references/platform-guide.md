@@ -14,7 +14,7 @@ All fetch attempts follow this priority order, mirroring the `web-fetcher` skill
 | 2 | **twitter-thread.com** *(Twitter/X only)* | `https://twitter-thread.com/t/<tweet-id>` | Public thread reader; extract tweet ID from URL. |
 | 3 | **defuddle.md** | `https://defuddle.md/<url>` | Good fallback for structured articles; less reliable on SPAs. |
 | 4 | **markdown.new** | `https://markdown.new/<url>` | Last-resort converter; output quality varies. |
-| 5 | **WebSearch** | `WebSearch` tool with author + topic keywords | Use when all proxy tiers fail. Synthesize from indexed snippets + linked sources. Works well for widely-discussed posts; unreliable for obscure or very recent content. |
+| 5 | **Search Synthesis** | `WebSearch` tool with author + topic keywords | Use when all proxy tiers fail. Returns third-party commentary — NOT the original post. Label digest `Fetch Method: search-synthesis`. Works for viral posts; unreliable for obscure or very recent content. |
 
 Stop at the first tier that returns ≥ 100 characters without auth-wall signals. If all tiers including WebSearch fail, report all errors and stop.
 
@@ -74,10 +74,20 @@ Example: `twitter-karpathy-diffusion-models-digest-20260321.md`
 - App deep link: `xhsshare://...` — **not supported**, cannot fetch from CLI
 
 ### Fetch Behavior
-- **Best-effort only.** Xiaohongshu is a mobile-first, login-encouraged platform.
-- Jina Reader can sometimes extract the caption text for public posts.
+
+**Tier 0 — `redbook` CLI (preferred when authenticated)**:
+```bash
+redbook read <url>          # read note by URL
+redbook whoami              # verify auth status
+```
+Install: `npm install -g @lucasygu/redbook`. Requires one-time browser cookie setup. When authenticated, this is the most reliable method — bypasses all proxy blocks.
+
+**Proxy tiers (Tier 1–4)**: Best-effort only. Xiaohongshu is mobile-first and login-encouraged; proxy services are frequently blocked (403).
+- Jina Reader can sometimes extract caption text for public posts.
 - Many posts are primarily images with short captions — extractable text may be very short (< 200 chars).
 - Auth-wall signal: response contains `"登录"` (login), `"注册"` (register), or `"请登录后查看"`.
+
+**Search Synthesis (Tier 5)**: Works for viral posts that have been widely discussed and indexed. Labels as `search-synthesis` — confidence is lower than a direct fetch.
 
 ### Content Shape
 Red Note posts typically have:

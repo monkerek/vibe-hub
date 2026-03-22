@@ -1,13 +1,13 @@
 ---
 name: post-research
-description: Transforms social media posts and tech blog articles into structured digests. Optimized for tech blog posts and public tweets/X threads. Supports best-effort extraction for Red Note (小红书) posts. Triggers on requests like "digest this tweet", "summarize this blog post", "research this Red Note post", or any task that provides a URL to a social post or short-form article.
+description: Transforms social media posts and tech blog articles into structured digests. Optimized for tech blog posts. Best-effort for Twitter/X and Red Note (小红书) — social platforms are walled and may only be reachable via Search Synthesis or platform CLIs. Triggers on requests like "digest this tweet", "summarize this blog post", "research this Red Note post", or any task that provides a URL to a social post or short-form article.
 ---
 
 # Post Research
 
 ## Overview
 
-This skill fetches and transforms short-form web content — tweets/X threads, Red Note (小红书) posts, and tech blog articles — into structured, reusable digests. It uses a 5-tier fallback chain (Jina Reader → twitter-thread.com → defuddle.md → markdown.new → WebSearch) to extract clean Markdown. Output is saved to `digest/posts/`.
+This skill fetches and transforms short-form web content — tweets/X threads, Red Note (小红书) posts, and tech blog articles — into structured, reusable digests. It uses a tiered fetch strategy (proxy chain → platform CLIs → Search Synthesis) to extract clean Markdown. Output is saved to `digest/posts/`.
 
 ## 📦 Dependencies
 
@@ -23,12 +23,13 @@ You MUST follow this checklist for every post research task:
 
 1. [ ] **Identify & Triage**: Confirm the URL and detect the platform (Twitter/X, Red Note, or blog). See `references/platform-guide.md` for per-platform quirks.
 2. [ ] **Fetch Content**: Attempt each source in order, stopping at the first success. Log the response length at each step.
+   - **Tier 0 — Platform CLI** *(Red Note only)*: `redbook read <url>` — native CLI using browser cookies; requires one-time `redbook whoami` auth setup. Skip if not authenticated.
    - **Tier 1 — Jina Reader**: `r.jina.ai/<url>` with header `Accept: text/markdown`
    - **Tier 2 — twitter-thread.com** *(Twitter/X only)*: `https://twitter-thread.com/t/<tweet-id>` (public thread reader; extract the tweet ID from the original URL)
    - **Tier 3 — defuddle.md**: `defuddle.md/<url>` (fallback if prior tiers fail or return < 100 chars)
    - **Tier 4 — markdown.new**: `markdown.new/<url>` (last resort for direct fetch)
-   - **Tier 5 — WebSearch**: Search `<author> <topic keywords> <platform>` using the `WebSearch` tool. Synthesize from indexed snippets and linked sources. For Twitter, search by topic/author — not by tweet ID alone. Document in digest metadata that content was recovered via search.
-   - If all tiers fail, report all errors and stop — do NOT attempt raw HTML as the digest would be unusable.
+   - **Search Synthesis (Last Resort)**: Use the `WebSearch` tool with `<author> <topic keywords> <platform>`. This returns indexed third-party commentary — NOT the original post. You MUST label the digest `Fetch Method: search-synthesis` and note it in a prominent warning. For Twitter, search by topic/author — tweet ID searches are unreliable.
+   - If all tiers AND Search Synthesis fail, report all errors and stop.
 3. [ ] **Auth Wall Check**: Scan the fetched content for auth-wall signals (`sign in`, `log in`, `create account`, `verify you are human`). If detected, stop and report the failure — do NOT proceed with partial content.
 4. [ ] **Detect Language**: Identify the primary language of the content (en, zh, etc.) and note it in the digest metadata.
 5. [ ] **Detect Content Shape**: Distinguish between a single post (short), a thread (sequential), or a long-form article, as this affects how the digest is structured.
@@ -58,6 +59,7 @@ In all three cases, report the specific failure reason and stop.
 ## 📝 Anti-Patterns
 
 - **Auth Wall Passthrough**: Summarizing login-page content as if it were the actual post.
+- **Search-Synthesis Passthrough**: Using WebSearch results as if they were fetched post content — search results are third-party commentary, not the original post. Always label `Fetch Method: search-synthesis` and note confidence limitations.
 - **Image-Only Fabrication**: Inventing captions or post text for Red Note posts that returned no extractable content.
 - **Thread Collapse**: Summarizing only the first tweet in a thread instead of the full thread.
 - **Wrong Destination**: Saving to `digest/media/` or `digest/paper/` instead of `digest/posts/`.
