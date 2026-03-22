@@ -1,4 +1,4 @@
-import { fgColor, bgColor, bold, reset, progressBar } from './colors.js';
+import { fgColor, bgColor, reset, progressBar } from './colors.js';
 import { resolveSegmentStyle, getThemeSeparator } from '../config.js';
 import type {
   RenderContext,
@@ -88,6 +88,8 @@ function renderContext(ctx: RenderContext): string | undefined {
 function renderUsage(ctx: RenderContext): string | undefined {
   const u = ctx.usage;
   if (!u || u.fiveHourLimit === undefined || u.fiveHourUsage === undefined) return undefined;
+  // Guard against divide-by-zero: a limit of 0 would produce Infinity%
+  if (u.fiveHourLimit === 0) return undefined;
 
   const percent = Math.round((u.fiveHourUsage / u.fiveHourLimit) * 100);
   const bar = progressBar(percent, 6);

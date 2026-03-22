@@ -325,6 +325,48 @@ describe('truncateAnsi — grapheme-cluster awareness', () => {
   });
 });
 
+// ─── R2 Issue 9: bold imported but never used ─────────────────────────────────
+
+describe('segments.ts — no unused bold import', async () => {
+  it('segments.ts source does not import bold from colors', async () => {
+    const { readFile } = await import('node:fs/promises');
+    const src = await readFile(
+      new URL('../src/render/segments.ts', import.meta.url),
+      'utf-8',
+    );
+    assert.ok(!src.includes('bold'), 'bold should not be imported in segments.ts');
+  });
+});
+
+// ─── R2 Issue 10: renderUsage Infinity% when fiveHourLimit === 0 ─────────────
+
+describe('renderUsage — fiveHourLimit edge cases', () => {
+  it('returns no segment when fiveHourLimit is 0 (avoids Infinity%)', () => {
+    const segs = buildWith({
+      usage: { fiveHourUsage: 100, fiveHourLimit: 0 },
+    }, ['usage']);
+    assert.equal(segs.length, 0, 'segment should be absent when limit is 0 to avoid Infinity%');
+  });
+
+  it('still shows usage when limit is a normal positive value', () => {
+    const segs = buildWith({
+      usage: { fiveHourUsage: 500, fiveHourLimit: 1000 },
+    }, ['usage']);
+    assert.equal(segs.length, 1);
+    assert.ok(segs[0].text.includes('50%'));
+  });
+
+  it('bar is clamped but text shows real % when over limit (not Infinity)', () => {
+    // 1200 / 1000 = 120% — no division by zero, just over-limit
+    const segs = buildWith({
+      usage: { fiveHourUsage: 1200, fiveHourLimit: 1000 },
+    }, ['usage']);
+    assert.equal(segs.length, 1);
+    assert.ok(segs[0].text.includes('120%'));
+    assert.ok(segs[0].text.includes('██████')); // bar fully filled (clamped by progressBar)
+  });
+});
+
 // ─── MINOR 12: git -ushort (speed) — structural check ────────────────────────
 
 describe('getGitStatus — uses -ushort', async () => {

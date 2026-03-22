@@ -73,6 +73,9 @@ function renderUsage(ctx) {
     const u = ctx.usage;
     if (!u || u.fiveHourLimit === undefined || u.fiveHourUsage === undefined)
         return undefined;
+    // Guard against divide-by-zero: a limit of 0 would produce Infinity%
+    if (u.fiveHourLimit === 0)
+        return undefined;
     const percent = Math.round((u.fiveHourUsage / u.fiveHourLimit) * 100);
     const bar = progressBar(percent, 6);
     let resetText = '';
