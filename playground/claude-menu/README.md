@@ -60,6 +60,8 @@ mkdir -p ~/.claude/commands/claude-menu && cp commands/setup.md commands/configu
 ```
 
 > **Run this from inside the `claude-menu` directory** (where you ran `npm install`).
+>
+> Re-run this command after any `git pull` to pick up updated command definitions.
 
 ### 5. Install the config
 

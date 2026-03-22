@@ -4,124 +4,170 @@ Interactive configuration wizard for Claude Menu.
 
 ## Instructions
 
-Guide the user through configuring their Claude Menu statusline step by step. Use bash tools to read and write files.
+Guide the user through each step below. Use bash tools to read and write files. At the end, write a single clean TOML config with **no inline comments**.
 
-### Prerequisite: Locate the dist/index.js path
+---
 
-Read `~/.claude/settings.json` and extract the path from the `statusLine` field:
+### Prerequisite: Locate dist/index.js
 
+Read `~/.claude/settings.json`. Extract the file path from the `statusLine` value — it looks like `node /some/path/dist/index.js`. Store the file path (the part after `node `) as DIST for use in the preview step.
+
+If `settings.json` has no `statusLine` field, run:
 ```bash
-cat "$HOME/.claude/settings.json"
+find "$HOME" -maxdepth 6 -name "index.js" -path "*/claude-menu/dist/*" 2>/dev/null | head -5
+```
+Use the first result as DIST. If nothing is found, ask the user for the absolute path to their `claude-menu/dist/index.js`.
+
+---
+
+### Step 1: Theme
+
+Ask the user to pick a theme by number:
+
+```
+1  pastel-rainbow   Soft pastel gradient. Best for dark terminals.
+2  claude-orange    Anthropic warm orange. Bold and branded.
+3  nord-frost       Nord frost. Cool, calm, minimal.
+4  dracula          Vibrant purples, pinks, greens.
+5  catppuccin       Catppuccin Mocha. Warm pastels on dark bg.
+6  monochrome       Clean grayscale. Distraction-free.
+7  custom           Define all segment colors yourself.
 ```
 
-The `statusLine` value looks like `node /path/to/claude-menu/dist/index.js`. Extract the file path (everything after `node `). Store it as DIST_INDEX for use in the preview step. If `settings.json` is missing or has no `statusLine`, tell the user to run `/claude-menu:setup` first and stop.
+Record the chosen `THEME_NAME`.
 
----
+Then ask about the powerline separator. Present these as numbered choices:
 
-### Step 1: Theme Selection
-
-Show the user the available built-in themes and ask them to pick one, or offer to build a custom theme:
-
-**Built-in themes:**
-| Name | Description |
-|---|---|
-| `pastel-rainbow` | Soft pastel gradient (green → yellow → orange → pink → purple). Best for dark terminals. |
-| `claude-orange` | Anthropic warm orange palette. Bold and branded. |
-| `nord-frost` | Nord frost variant. Cool, calm, minimal. |
-| `dracula` | Vibrant purples, pinks, and greens. |
-| `catppuccin` | Catppuccin Mocha — warm pastels on dark background. |
-| `monochrome` | Clean grayscale. Distraction-free. |
-
-Also ask:
-- **Separator glyph**: `""` (powerline arrow, requires Nerd Font), `""` (thin), `"│"` (pipe), or `""` (none)
-- **Rounded caps**: `true` (requires Nerd Font) or `false`
-
-If the user wants a **custom theme**, skip `name` and collect `fg`/`bg`/`icon` for each segment they plan to use (see segment list in Step 3). Use any non-builtin string as the name (e.g. `"my-theme"`).
-
----
-
-### Step 2: Layout Mode
-
-Ask the user to choose:
-- `expanded` — Two lines: primary segments on line 1, activity segments (tools/agents/todos) on line 2. Line 2 only appears when there is activity to show.
-- `compact` — Everything on a single line, truncated to terminal width.
-
----
-
-### Step 3: Segment Selection
-
-Show the available segments and ask the user which to enable and in what order:
-
-| Segment | Example | Description |
-|---|---|---|
-| `motto` | `🚀 Ship it!` | Dynamic motto / status message |
-| `model` | `🤖 claude-sonnet-4-6` | Current Claude model |
-| `project` | `📁 …/my-project` | Working directory (last 2 path components) |
-| `git` | `🔀 main* !2 ?1` | Branch, dirty indicator, file stats |
-| `context` | `░░████ 34%` | Context window usage bar |
-| `usage` | `██░░░░ 20% (3h 15m)` | API quota bar with reset countdown |
-| `tools` | `🔧 ◐ Bash, Read` | Running tool calls |
-| `agents` | `🤝 ◐ researcher` | Running sub-agents |
-| `todos` | `✅ ▸ Write tests (2/5)` | Todo progress |
-| `environment` | `⚙️` | CLAUDE.md count, MCPs, hooks |
-| `time` | `🕐 14:32` | Current local time |
-
-In `expanded` mode, `tools`, `agents`, `todos`, `usage`, and `environment` always appear on line 2 regardless of their position in the list.
-
----
-
-### Step 4: Motto Configuration
-
-Ask the user about motto settings:
-
-1. **Strategy**: `day-of-week` · `random` · `sequential` · `time-of-day` · `manual`
-2. **Source**: built-in pack or custom list
-   - Built-in packs: `motivational-en` · `chill-zh` · `dev-humor` · `zen` · `startup-energy`
-   - Custom: collect mottos from the user as a TOML array
-3. **Emoji**: enable/disable emoji in mottos (`true` / `false`)
-
-If strategy is `day-of-week`, optionally collect per-day overrides:
-
-```toml
-[motto.dayOfWeek]
-monday    = "🔥 New week, new features"
-friday    = "🎉 Ship it Friday!"
+```
+1  (no separator — plain blocks)
+2  │  (pipe)
+3    (powerline arrow — requires Nerd Font)
+4    (thin arrow — requires Nerd Font)
 ```
 
-If strategy is `manual`, collect `current`:
+Record `SEPARATOR` as exactly one of these character values:
+- Choice 1 → empty string (no character)
+- Choice 2 → │
+- Choice 3 → the powerline arrow glyph
+- Choice 4 → the thin arrow glyph
+
+Then ask: "Enable rounded caps? (requires Nerd Font) [Y/n]". Record `ROUNDED` as `true` or `false`.
+
+If the user chose custom theme (option 7), collect `fg` and `bg` hex colors for each segment they plan to use (see Step 3 segment list). Use `"my-theme"` as the name or let the user name it.
+
+---
+
+### Step 2: Layout
+
+Ask the user to choose layout mode:
+
+```
+1  expanded   Two lines: main segments on line 1, activity on line 2
+2  compact    Single line, truncated to terminal width
+```
+
+Record `LAYOUT_MODE`.
+
+---
+
+### Step 3: Segments
+
+Show the available segments and ask the user which to include and in what order:
+
+```
+motto        Dynamic motto / status message
+model        Current Claude model name
+project      Working directory (last 2 path components)
+git          Branch, dirty flag, file stats
+context      Context window usage bar
+usage        API quota bar with reset countdown
+tools        Running tool calls
+agents       Running sub-agents
+todos        Todo progress
+environment  CLAUDE.md count, MCPs, hooks
+time         Current local time
+```
+
+Record `SEGMENTS` as an ordered list. In `expanded` mode: `tools`, `agents`, `todos`, `usage`, `environment` always render on line 2 regardless of position.
+
+---
+
+### Step 4: Motto
+
+Ask the user to choose a motto strategy:
+
+```
+1  day-of-week    Cycles by weekday
+2  random         Random each render
+3  sequential     Advances by day-of-year
+4  time-of-day    Morning / afternoon / evening / night
+5  manual         Always shows a fixed message
+```
+
+Ask which motto source to use:
+- **Built-in pack**: `motivational-en`, `chill-zh`, `dev-humor`, `zen`, `startup-energy`
+- **Custom list**: collect mottos from the user
+
+If strategy is `manual`, ask for the fixed `current` text.
+
+If strategy is `day-of-week`, optionally collect per-day overrides (monday … sunday).
+
+Ask: "Show emoji in mottos? [Y/n]". Record `MOTTO_EMOJI` as `true` or `false`.
+
+---
+
+### Step 5: Preview and write config
+
+Build the TOML in memory and **show it to the user as a preview** before writing. The TOML must be:
+- Clean — no inline comments anywhere
+- No blank line at the start of the file
+- Separator written as the literal character (or empty for none), not a description
+
+Example of what a correct config looks like (do not copy this verbatim — fill in the user's choices):
 
 ```toml
+[theme]
+name = "pastel-rainbow"
+separator = ""
+rounded = true
+
+[layout]
+mode = "expanded"
+segments = ["motto", "project", "git", "model", "context", "time"]
+
 [motto]
-strategy = "manual"
-current = "🔥 Shipping today"
+enabled = true
+strategy = "day-of-week"
+pack = "motivational-en"
+emoji = true
 ```
 
----
+For `separator`:
+- If the user chose no separator: write `separator = ""`
+- If they chose │: write `separator = "│"`
+- If they chose the powerline arrow: write `separator = ""` (with the  glyph between the quotes)
+- If they chose the thin arrow: write `separator = ""` (with the  glyph between the quotes)
 
-### Step 5: Write Config
-
-Show the user a **preview** of the full `config.toml` that will be written, then ask for confirmation before writing.
-
-Write the confirmed config to `~/.claude/plugins/claude-menu/config.toml` (create directory if needed):
+Ask the user to confirm. If they say yes, write the config:
 
 ```bash
 mkdir -p "$HOME/.claude/plugins/claude-menu"
 ```
 
+Then write the confirmed content to `~/.claude/plugins/claude-menu/config.toml`.
+
 ---
 
-### Step 6: Preview Render
+### Step 6: Live preview
 
-After saving, run a live render using the path extracted in the Prerequisite step:
+Run a render using DIST from the Prerequisite step:
 
 ```bash
 echo '{"model":{"display_name":"claude-sonnet-4-6"},"context_window":{"used_percentage":34,"context_window_size":200000},"cwd":"/home/user/my-project"}' \
-  | node DIST_INDEX
+  | node DIST
 ```
 
-(Replace `DIST_INDEX` with the actual path from `~/.claude/settings.json`.)
-
-Show the output and ask if the user is happy with it. If not, offer to go back to any step and adjust.
+Replace `DIST` with the actual path. Show the output to the user. If it is empty or shows an error, show the raw output and suggest running `npm run build` in the claude-menu directory.
 
 ---
 
@@ -129,5 +175,5 @@ Show the output and ask if the user is happy with it. If not, offer to go back t
 
 Tell the user:
 
-> **Configuration saved!** Your statusline will update automatically — no restart needed for config changes.
+> **Config saved!** The statusline reads `~/.claude/plugins/claude-menu/config.toml` on every render — no restart needed for config changes.
 > Run `/claude-menu:configure` again any time to adjust.
