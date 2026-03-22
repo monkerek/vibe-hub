@@ -52,7 +52,7 @@ export function visibleLength(str) {
     }
     return len;
 }
-function isWide(cp) {
+export function isWide(cp) {
     // CJK Unified Ideographs, CJK Compatibility, Hangul, Fullwidth forms, Emoji
     return ((cp >= 0x1100 && cp <= 0x115f) ||
         (cp >= 0x2e80 && cp <= 0x9fff) ||
