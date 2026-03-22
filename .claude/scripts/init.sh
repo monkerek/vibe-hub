@@ -5,7 +5,6 @@
 
 set -uo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="/tmp/vibe-hub-init.log"
 
 # ---------------------------------------------------------------------------
@@ -48,8 +47,8 @@ install_gh() {
   ); then
     # Authenticate if a token is available via env
     if [[ -n "${GH_TOKEN:-}" ]] || [[ -n "${GITHUB_TOKEN:-}" ]]; then
-      log "gh: authenticating with provided token..."
-      gh auth status &>/dev/null || true
+      log "gh: verifying token-based auth..."
+      gh auth status &>/dev/null || log "gh: token present but auth status check failed."
     fi
     log "gh installed successfully ($(gh --version | head -1))."
   else
@@ -107,6 +106,7 @@ main() {
 }
 
 # Run main in the background; output goes only to the log file.
+: > "$LOG_FILE"
 main &
 INIT_PID=$!
 
