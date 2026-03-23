@@ -11,6 +11,8 @@
 
 set -euo pipefail
 
+trap 'echo "[gws-auth] ERROR in $0 on line $LINENO" >> /tmp/configure-gws-auth.log' ERR
+
 LOG_FILE="/tmp/configure-gws-auth.log"
 log() { echo "[gws-auth] $(date -Iseconds) $*" >> "$LOG_FILE"; }
 
@@ -32,12 +34,18 @@ if [[ -z "${GWS_CREDENTIALS:-}" ]]; then
   exit 0
 fi
 
-# Skip if credentials are already written.
+# Reconcile credentials — overwrite if env var differs from file on disk.
+# This ensures rotated or revoked credentials are picked up on new sessions.
 config_dir="${HOME}/.config/gws"
 cred_file="${config_dir}/credentials.json"
+
 if [[ -f "$cred_file" ]]; then
-  log "SKIP: credentials already exist at $cred_file ($(wc -c < "$cred_file") bytes)"
-  exit 0
+  existing="$(cat "$cred_file")"
+  if [[ "$existing" == "$GWS_CREDENTIALS" ]]; then
+    log "SKIP: credentials already match at $cred_file ($(wc -c < "$cred_file") bytes)"
+    exit 0
+  fi
+  log "UPDATE: credentials differ — overwriting $cred_file"
 fi
 
 mkdir -p "$config_dir"

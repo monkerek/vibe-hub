@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/scripts/configure-gws-auth.sh"
+            "command": "\"${CLAUDE_PROJECT_DIR}/.claude/scripts/configure-gws-auth.sh\""
           }
         ]
       }
