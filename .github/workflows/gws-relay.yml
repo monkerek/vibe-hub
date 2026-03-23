@@ -1,0 +1,83 @@
+name: GWS API Relay
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_path:
+        description: 'Google API path (e.g., drive/v3/files?pageSize=1)'
+        required: true
+        type: string
+      http_method:
+        description: 'HTTP method (GET, POST, PUT, DELETE)'
+        required: false
+        default: 'GET'
+        type: string
+      request_body:
+        description: 'JSON request body (for POST/PUT)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  relay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh OAuth Token
+        id: token
+        run: |
+          RESPONSE=$(curl -s -X POST "https://oauth2.googleapis.com/token" \
+            -d "client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -d "client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            -d "refresh_token=${{ secrets.GOOGLE_REFRESH_TOKEN }}" \
+            -d "grant_type=refresh_token")
+
+          TOKEN=$(echo "$RESPONSE" | jq -r '.access_token')
+          if [ "$TOKEN" = "null" ] || [ -z "$TOKEN" ]; then
+            echo "ERROR: Failed to get token"
+            echo "$RESPONSE"
+            exit 1
+          fi
+          echo "::add-mask::$TOKEN"
+          echo "access_token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Call Google API
+        id: api_call
+        run: |
+          API_URL="https://www.googleapis.com/${{ inputs.api_path }}"
+          METHOD="${{ inputs.http_method }}"
+          TOKEN="${{ steps.token.outputs.access_token }}"
+
+          CURL_ARGS=(
+            -s
+            -w "\n---HTTP_STATUS:%{http_code}---"
+            -X "$METHOD"
+            -H "Authorization: Bearer $TOKEN"
+            -H "Content-Type: application/json"
+          )
+
+          BODY='${{ inputs.request_body }}'
+          if [ -n "$BODY" ] && [ "$BODY" != "" ]; then
+            CURL_ARGS+=(-d "$BODY")
+          fi
+
+          FULL_RESPONSE=$(curl "${CURL_ARGS[@]}" "$API_URL")
+
+          HTTP_STATUS=$(echo "$FULL_RESPONSE" | grep -o 'HTTP_STATUS:[0-9]*' | cut -d: -f2)
+          RESPONSE_BODY=$(echo "$FULL_RESPONSE" | sed 's/\n---HTTP_STATUS:[0-9]*---$//')
+
+          echo "http_status=$HTTP_STATUS" >> "$GITHUB_OUTPUT"
+
+          # Write response to file (handles multi-line JSON)
+          echo "$RESPONSE_BODY" > /tmp/api_response.json
+
+          echo "### API Response (HTTP $HTTP_STATUS)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          echo "$RESPONSE_BODY" | head -100 >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Response
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-response
+          path: /tmp/api_response.json
+          retention-days: 1
