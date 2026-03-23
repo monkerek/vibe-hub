@@ -11,19 +11,44 @@
 | GWS_CREDENTIALS    | Set via environment variable        |
 | Credential type    | `authorized_user` (OAuth)           |
 
-## Authentication Status: FAIL
+## Authentication Status: PARTIAL (OAuth works, API calls blocked)
 
-### Symptom
+### OAuth Token Refresh: PASS
+
+Token refresh via `oauth2.googleapis.com` succeeds. Granted scopes:
+
+- `https://www.googleapis.com/auth/drive`
+- `https://www.googleapis.com/auth/gmail.modify`
+- `https://www.googleapis.com/auth/calendar`
+- `https://www.googleapis.com/auth/spreadsheets`
+- `https://www.googleapis.com/auth/documents`
+- `https://www.googleapis.com/auth/presentations`
+- `https://www.googleapis.com/auth/tasks`
+- `https://www.googleapis.com/auth/cloud-platform`
+
+### API Calls: FAIL
 
 All `gws` commands fail with:
 
 ```
-error[discovery]: Failed to fetch Discovery Document for <service>: HTTP 403 Forbidden
+error[discovery]: Failed to fetch Discovery Document for <service>: HTTP 403/404
 ```
+
+Direct API calls with a valid Bearer token also return 403.
+
+### Network Reachability
+
+| Domain                      | Status | Notes                        |
+|-----------------------------|--------|------------------------------|
+| `oauth2.googleapis.com`     | OK     | Token refresh works (400/200)|
+| `www.googleapis.com`        | 403    | Blocked — Discovery + APIs   |
+| `sheets.googleapis.com`     | 403    | Blocked                      |
+| `gmail.googleapis.com`      | 403    | Blocked                      |
+| `content.googleapis.com`    | 403    | Blocked                      |
 
 ### Root Cause
 
-The `NO_PROXY` / `no_proxy` environment variables include `*.googleapis.com` and `*.google.com`. This causes `gws` HTTP requests to bypass the container's egress proxy and attempt direct network access, which is blocked by the environment's firewall (returns 403).
+The container's egress proxy allowlists `oauth2.googleapis.com` but blocks the actual Google API endpoints (`www.googleapis.com`, `sheets.googleapis.com`, `gmail.googleapis.com`, etc.). Both direct and proxy-routed requests return 403, confirming this is an **infrastructure-level network restriction**, not a credential or proxy-bypass issue.
 
 ### Available Services (per gws help)
 
@@ -31,4 +56,8 @@ drive, sheets, gmail, calendar, admin-reports, reports, docs, slides, tasks, peo
 
 ### Recommended Fix
 
-Remove `*.googleapis.com` and `*.google.com` from the `NO_PROXY` and `no_proxy` environment variables at the container/deployment configuration level so that Google API traffic routes through the authorized egress proxy.
+Add the following domains to the egress proxy's allowlist:
+
+- `www.googleapis.com` (Discovery Documents + legacy API endpoints)
+- `*.googleapis.com` (service-specific endpoints like sheets, gmail, etc.)
+- `*.google.com` (optional, for additional Google services)
