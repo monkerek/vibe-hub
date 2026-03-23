@@ -69,6 +69,13 @@ install_gws() {
       cp "$extracted_dir/gws" /usr/local/bin/gws
       chmod +x /usr/local/bin/gws
       log "gws installed successfully ($(gws --version 2>/dev/null || echo 'installed'))."
+      # Write credentials only if the env var is set (avoids "unbound variable" with set -u).
+      if [[ -n "${GWS_CREDENTIALS:-}" ]]; then
+        echo "$GWS_CREDENTIALS" > "$HOME/gws_credentials.json"
+        export GOOGLE_WORKSPACE_CLI_CREDENTIALS_FILE="$HOME/gws_credentials.json"
+      else
+        log "WARNING: GWS_CREDENTIALS not set — skipping credentials setup."
+      fi
     else
       log "WARNING: gws binary not found in release archive — skipping."
     fi
