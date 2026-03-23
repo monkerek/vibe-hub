@@ -4,7 +4,7 @@ source: "YouTube"
 url: "https://youtu.be/_VaEjGnHgOI"
 author: "李自然说"
 duration: "27:32"
-publish_date: "unknown (YouTube direct metadata inaccessible in current environment)"
+date_published: "unknown (YouTube direct metadata inaccessible in current environment)"
 processed_date: "2026-03-23"
 language: "zh"
 tags:
@@ -109,4 +109,4 @@ This episode is an explainer-style technical podcast/video that introduces the 2
 
 ---
 
-*Generated: 2026-03-23 | Skill: media-digest | Method: Secondary-source fallback (YouTube access blocked in shell environment)*
+*Processed: 2026-03-23 | Skill: media-digest | Method: Secondary-source fallback (YouTube access blocked in shell environment)*
