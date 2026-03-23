@@ -78,6 +78,23 @@ install_gws() {
   rm -rf "$tmp_dir"
 }
 
+configure_gws_auth() {
+  # Write GWS_CREDENTIALS (set as a sandbox secret env var) to the default
+  # gws config path so authentication persists into the session without
+  # relying on exported env vars.
+  if [[ -z "${GWS_CREDENTIALS:-}" ]]; then
+    log "GWS_CREDENTIALS not set — skipping gws auth configuration."
+    return 0
+  fi
+
+  local config_dir="${HOME}/.config/gws"
+  mkdir -p "$config_dir"
+
+  printf '%s' "$GWS_CREDENTIALS" > "$config_dir/credentials.json"
+  chmod 600 "$config_dir/credentials.json"
+  log "gws credentials written to $config_dir/credentials.json."
+}
+
 # ---------------------------------------------------------------------------
 # Main — run all installs synchronously.  Setup scripts must complete before
 # the session starts.  Individual failures are logged but do not abort the rest.
@@ -87,5 +104,6 @@ log "=== Starting dependency installation ($(date -Iseconds)) ==="
 
 install_gh
 install_gws
+configure_gws_auth
 
 log "=== Dependency installation complete ($(date -Iseconds)) ==="
