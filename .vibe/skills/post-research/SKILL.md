@@ -1,6 +1,6 @@
 ---
 name: post-research
-description: Researches blog posts, social media threads, and online articles to produce structured learning digests with author context, claim verification, and practical takeaways. TRIGGER when: user asks to research a blog post, analyze a Twitter/X thread, digest an online article, or create a digest from a web post or newsletter. DO NOT TRIGGER when: user asks to research academic papers (use doc-research), analyze video/audio content (use media-digest), or research GitHub repositories (use repo-research).
+description: Researches informal blog posts, social media threads, and newsletters to produce structured learning digests with author context, claim verification, and practical takeaways. TRIGGER when: user asks to research an informal blog post, analyze a Twitter/X thread, or create a digest from a web post or newsletter. DO NOT TRIGGER when: user asks to research academic papers, technical documentation, or long-form technical articles (use doc-research), analyze video/audio content (use media-digest), or research GitHub repositories (use repo-research).
 ---
 
 # Post Research
@@ -46,7 +46,7 @@ Do NOT finalize the digest until the Devil's Advocate pass is complete and at le
 </HARD-GATE>
 
 7. [ ] **Synthesis**: Generate the digest using `templates/default.md`.
-8. [ ] **Naming & Output**: Save to `digest/post/<source-slug>-digest-YYYYMMDD.md` using kebab-case. For Twitter, use the author handle as the source slug (e.g., `twitter-karpathy-digest-20260324.md`). For blogs, use the site or author name (e.g., `lilian-weng-digest-20260324.md`).
+8. [ ] **Naming & Output**: Save to `digest/post/<source-slug>-digest-YYYYMMDD.md` using kebab-case. For Twitter, use a slug like `twitter-<author-handle>-<subject>` (e.g., `twitter-karpathy-ai-agents-digest-20260324.md`). For blogs, use the site or author name (e.g., `lilian-weng-digest-20260324.md`).
 
 ## Standards
 
