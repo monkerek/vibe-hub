@@ -11,12 +11,52 @@ Extraction strategies, quality signals, and quirks for each supported platform.
 - Non-linear: quote tweets, replies, and sub-threads create branching narratives
 - Ephemeral: tweets can be deleted, accounts suspended, or visibility restricted
 - Rich context: author's bio, pinned tweet, and follower network provide credibility signals
+- **X Articles**: X supports native long-form "Articles" (`x.com/i/article/{id}`). These look like tweets linking to content but the full article lives on X.com itself. Articles are NOT fetchable via WebFetch — use the proxy chain below, then search for the author's cross-post (personal blog, newsletter) for the full text.
 
 ### Extraction Strategy
-1. **Thread reconstruction**: Fetch the full thread in chronological order. Include quoted tweets inline with attribution. Exclude reply noise unless it adds substantive context.
-2. **Media and links**: Note all embedded images, videos, and links. Images in technical threads often contain key diagrams or code screenshots.
-3. **Engagement context**: Note if the thread has significant quote-tweet discourse — corrections, counterarguments, or additions from domain experts may be more valuable than the original thread.
-4. **Profile context**: Check the author's bio, pinned tweet, and recent activity for expertise signals and potential commercial interests.
+
+**Critical: x.com requires JavaScript rendering and WILL FAIL with WebFetch. NEVER attempt a direct `WebFetch` to x.com or twitter.com URLs — it always returns a "JavaScript is not available" error page. Use the proxy chain below instead.**
+
+#### Step 1: Extract Tweet Metadata via Proxy API
+
+Transform the tweet URL into a proxy API call. Use this fallback chain (stop at first success):
+
+| Priority | Proxy | URL Pattern | Returns |
+|----------|-------|-------------|---------|
+| 1 | fxtwitter | `https://api.fxtwitter.com/{handle}/status/{id}` | Full text, engagement (likes/retweets/bookmarks/views), author bio, follower count, media, linked URLs |
+| 2 | vxtwitter | `https://api.vxtwitter.com/{handle}/status/{id}` | Text, engagement (likes/retweets/replies), author name, media, date |
+
+**URL transformation**: Given `https://x.com/HiTw93/status/2034627967926825175`, extract `handle=HiTw93` and `id=2034627967926825175`, then call `https://api.fxtwitter.com/HiTw93/status/2034627967926825175`.
+
+**Prefer fxtwitter** — it returns richer data (bookmarks, views, follower count) and often extracts the content of linked X Articles.
+
+#### Step 2: Follow External Links
+
+Tweets frequently link to external content (blog posts, articles, papers). After extracting the tweet:
+
+1. Check if the tweet links to an **X Article** (`x.com/i/article/{id}`). If so, the proxy may have extracted the article content. If not, proceed to Step 3.
+2. Check if the tweet links to an **external URL** (`t.co` redirect to a blog, Substack, etc.). If so, `WebFetch` the external URL directly.
+3. If neither proxy extracted the full content, **search for the article title** (extracted from the tweet/preview) + the author's known blog domain to find a cross-posted version.
+
+#### Step 3: Locate Cross-Posted Content (if needed)
+
+Many technical authors cross-post between X and their personal blogs. When the tweet links to an X Article or the proxy content is insufficient:
+
+1. `WebSearch` for `"{article title}" {author handle} site:{known blog domain}` — e.g., `"你不知道的 Agent" tw93 site:tw93.fun`
+2. `WebSearch` for `"{article title}" {author handle}` more broadly if no blog domain is known.
+3. `WebFetch` the blog version — personal blogs are almost always fetchable and contain the complete, formatted content.
+
+#### Step 4: Thread Reconstruction (for multi-tweet threads)
+
+If the content is a thread (not a single tweet or Article):
+1. The proxy response may include thread context. If not, search for `from:{handle} "thread" {keywords}` to find thread unrollers or summaries.
+2. Reconstruct the full thread in reading order. Include quoted tweets inline with attribution. Exclude reply noise unless it adds substantive context.
+
+#### Step 5: Engagement & Profile Context
+
+1. **Engagement**: Note engagement metrics from the proxy response. fxtwitter provides the most complete data (views, bookmarks).
+2. **Profile context**: The proxy returns author bio and follower count. Cross-reference with `WebSearch` for the author's other platforms (GitHub, personal site) to assess expertise.
+3. **Discourse**: Search for quote-tweets and responses from domain experts — corrections, counterarguments, or additions may be more valuable than the original content.
 
 ### Quality Signals
 - Author has verifiable expertise (job title, publications, open-source work)

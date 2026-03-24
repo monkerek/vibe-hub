@@ -16,11 +16,10 @@ The skill is platform-aware: it adapts extraction and evaluation strategies base
 You MUST follow this checklist when researching a post:
 
 1. [ ] **Identify Source & Platform**: Determine the platform (Twitter/X, blog, Substack, Medium, LinkedIn, etc.) and confirm output destination (e.g., `digest/post/`).
-2. [ ] **Content Extraction**: Fetch the full content using appropriate methods for the platform.
-   - For Twitter/X threads: reconstruct the full thread in reading order, including quoted tweets and key reply context.
+2. [ ] **Content Extraction**: Fetch the full content using the platform-specific strategy in `references/platforms.md`. You MUST read `references/platforms.md` before attempting extraction — it contains tested proxy chains and fallback sequences that prevent wasted fetch attempts.
+   - For Twitter/X: NEVER fetch x.com directly (it requires JavaScript and always fails). Use the proxy API chain in `references/platforms.md` (fxtwitter → vxtwitter). Then follow linked content to the author's blog or external source.
    - For blog posts/articles: extract the full text, preserving code blocks, embedded links, and images.
    - For newsletters: capture the full issue including any subscriber-only context if accessible.
-   - See `references/platforms.md` for platform-specific extraction strategies.
 3. [ ] **Author Context**: Research the author's background, expertise, and credibility in the topic area. Check their bio, notable work, and any disclosed affiliations or conflicts of interest.
 4. [ ] **Link Audit**: Identify all outbound links and references in the post. Categorize them:
    - Supporting evidence (papers, data, documentation)
@@ -65,6 +64,8 @@ Do NOT finalize the digest until the Devil's Advocate pass is complete and at le
 - **Link blindness**: Listing referenced links without checking whether they actually support the stated claims.
 - **Recency bias**: Treating a post as current without checking whether follow-up corrections, retractions, or community responses have updated the original claims.
 - **Platform conflation**: Applying the same extraction strategy to all platforms. A Twitter thread, a long-form blog post, and a LinkedIn article have fundamentally different structures.
+- **Direct fetching JavaScript-rendered platforms**: Attempting `WebFetch` on x.com, twitter.com, or other JS-rendered platforms wastes a fetch attempt and returns no content. Always use the proxy chain documented in `references/platforms.md` instead.
+- **Stopping at the tweet**: Many high-value X posts link to external articles (blog posts, X Articles, Substack). The tweet itself is metadata — the real content requires following the link. Always check for linked content and fetch the full article.
 
 ## Resources & Progressive Disclosure
 
