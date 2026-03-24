@@ -30,6 +30,15 @@ Transform the tweet URL into a proxy API call. Use this fallback chain (stop at 
 
 **Prefer fxtwitter** — it returns richer data (bookmarks, views, follower count) and often extracts the content of linked X Articles.
 
+#### Step 1b: Non-Proxy Fallback Strategy (If Proxies Fail)
+
+If the proxies above are blocked, down, or rate-limited, use the following fallback strategies to recover the content:
+
+1. **WebSearch by Handle and Keywords**: Use `WebSearch` with the author's handle and any context/keywords from the user's prompt or the tweet URL slug (e.g., `"your keywords" {author handle}`).
+2. **Search for Cross-Posts**: Authors frequently cross-post content to their blogs, Substack, LinkedIn, or other syndication networks. `WebSearch` for the suspected title or topic plus the author's name.
+3. **Web Archive Services**: Try fetching the cached version via `https://web.archive.org/web/{tweet_url}` or checking Google Cache if available.
+4. **Degraded Mode**: If all extraction fails, proceed with the digest using any available context from the user's prompt, making an explicit note in the output that the original X/Twitter source could not be extracted directly.
+
 #### Step 2: Follow External Links
 
 Tweets frequently link to external content (blog posts, articles, papers). After extracting the tweet:
