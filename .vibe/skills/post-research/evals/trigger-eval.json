@@ -1,0 +1,14 @@
+[
+  {"query": "research this blog post about RAG architectures", "should_trigger": true},
+  {"query": "create a digest from this Twitter thread about LLM agents", "should_trigger": true},
+  {"query": "analyze this Substack article on engineering management", "should_trigger": true},
+  {"query": "digest this X thread from @karpathy about AI trends", "should_trigger": true},
+  {"query": "research this Medium article about microservices", "should_trigger": true},
+  {"query": "summarize this LinkedIn post about hiring practices", "should_trigger": true},
+  {"query": "analyze this newsletter issue on startup strategy", "should_trigger": true},
+  {"query": "research this arxiv paper on transformer architectures", "should_trigger": false},
+  {"query": "create a digest from this YouTube video about React", "should_trigger": false},
+  {"query": "research the anthropic/claude-code GitHub repository", "should_trigger": false},
+  {"query": "review my pull request", "should_trigger": false},
+  {"query": "explain how RAG works", "should_trigger": false}
+]

@@ -1,6 +1,6 @@
 ---
 name: doc-research
-description: Transforms complex documents into structured learning digests. Optimized for academic papers, technical articles, and blog posts using a rigorous evaluation and verification-driven workflow.
+description: Transforms complex documents into structured learning digests. Optimized for academic papers, technical documentation, and long-form technical articles/blog posts using a rigorous evaluation and verification-driven workflow. DO NOT TRIGGER when: user asks to analyze informal blog posts, social media threads, or short newsletters (use post-research).
 ---
 
 # Doc Research
