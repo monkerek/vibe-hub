@@ -65,3 +65,4 @@ When modifying `VIBE.md`, ensure the instructions are compliant with all three s
 - @.vibe/skills/skill-author/SKILL.md
 - @.vibe/skills/address-feedback/SKILL.md
 - @.vibe/skills/socratic-interview/SKILL.md
+- @.vibe/skills/post-research/SKILL.md

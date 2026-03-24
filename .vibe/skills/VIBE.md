@@ -25,3 +25,4 @@ Refer to `.vibe/skills/skill-author/SKILL.md` for the mandatory creation workflo
 - @./skill-author/SKILL.md
 - @./address-feedback/SKILL.md
 - @./socratic-interview/SKILL.md
+- @./post-research/SKILL.md
