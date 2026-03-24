@@ -46,7 +46,7 @@ Do NOT finalize the digest until the Devil's Advocate pass is complete and at le
 </HARD-GATE>
 
 7. [ ] **Synthesis**: Generate the digest using `templates/default.md`.
-8. [ ] **Naming & Output**: Save to `digest/post/<source-slug>-digest-YYYYMMDD.md` using kebab-case. For Twitter, use a slug like `twitter-<author-handle>-<subject>` (e.g., `twitter-karpathy-ai-agents-digest-20260324.md`). For blogs, use the site or author name (e.g., `lilian-weng-digest-20260324.md`).
+8. [ ] **Naming & Output**: Save to `digest/post/<source-slug>-digest-YYYYMMDD.md` using kebab-case. For Twitter, use a slug like `twitter-<author-handle>-<subject>` (e.g., `twitter-karpathy-ai-agents-digest-20260324.md`). For blogs, use a slug like `<site-or-author-name>-<subject>` (e.g., `lilian-weng-llm-agents-digest-20260324.md`).
 
 ## Standards
 
