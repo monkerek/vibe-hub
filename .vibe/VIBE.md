@@ -10,7 +10,7 @@ Vibe Hub is a multi-agent research workspace designed for Gemini CLI, Claude Cod
 
 ## ⚖️ Core Mandates
 1. **Naming Convention**: Default to kebab-case for repository files and directories. Required platform entrypoints keep their mandated names: `VIBE.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, and `SKILL.md`.
-2. **Digest Naming**: Research digests MUST follow the pattern `<repo-name>-digest-YYYYMMDD.md`.
+2. **Digest Naming**: Research digests MUST follow the pattern `<source-slug>-digest-YYYYMMDD.md`. For GitHub repositories, the source slug is the repo name (e.g., `autoresearch`). For other sources, use a descriptive kebab-case prefix that identifies the source type and subject (e.g., `youtube-karpathy-loopy-era`, `twitter-catwu-pm-playbook`).
 3. **Skill Development**: Use concise, kebab-case directory names for skills (e.g., `repo-research/`) with `SKILL.md` as the required entrypoint. Follow `.vibe/skills/skill-author/SKILL.md`.
 4. **Tool Integrity**: Use the 3-phase research workflow (Discovery -> Prefetch -> Synthesize).
 5. **Security**: Never commit secrets or API keys. Protect `.env` files.
