@@ -137,9 +137,9 @@ The author is an engineer on the Claude Code team at Anthropic. The entire post 
 
 | Type | Reference | Priority | Notes |
 |------|-----------|----------|-------|
-| :wrench: | Claude Code Plugin Marketplaces | High | Official documentation for distributing internal skills. |
-| :page_facing_up: | Anthropic Frontend Design Skill Example | Medium | A practical example of a skill that provides opinionated design constraints. |
-| :movie_camera: | Anthropic Skilljar: Introduction to Agent Skills | Low | Introductory course for teams new to the concept. |
+| :wrench: | [Claude Code Plugin Marketplaces](https://code.claude.com/docs/en/plugin-marketplaces) | High | Official documentation for distributing internal skills. |
+| :page_facing_up: | [Anthropic Frontend Design Skill Example](https://github.com/anthropics/skills/blob/main/skills/frontend-design/SKILL.md) | Medium | A practical example of a skill that provides opinionated design constraints. |
+| :movie_camera: | [Anthropic Skilljar: Introduction to Agent Skills](https://anthropic.skilljar.com/introduction-to-agent-skills) | Low | Introductory course for teams new to the concept. |
 
 ---
 
