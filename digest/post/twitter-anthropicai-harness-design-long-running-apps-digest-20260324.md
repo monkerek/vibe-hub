@@ -1,7 +1,7 @@
 ---
 title: "Harness design for long-running application development"
-platform: "twitter"
-url: "https://twitter.com/AnthropicAI/status/2036481033621623056"
+platform: "blog"
+url: "https://www.anthropic.com/engineering/harness-design-long-running-apps"
 author: "Anthropic"
 date_published: "2026-03-24"
 date_processed: "2026-03-24"
