@@ -139,13 +139,13 @@ The author works at Cursor AI, a leading AI code editor. Cursor relies heavily o
 ## Key Quotes
 
 > "If your CLI drops into a prompt mid-execution, an agent is stuck. It can't press arrow keys or type 'y' at the right moment."
-> — eric zakariasson
+> — Eric Zakariasson
 
 > "An agent pattern-matches off `mycli deploy --env staging --tag v1.2.3` faster than it reads a description."
-> — eric zakariasson
+> — Eric Zakariasson
 
 > "Agents think in pipelines. They want to chain commands and pipe output between tools."
-> — eric zakariasson
+> — Eric Zakariasson
 
 ---
 
