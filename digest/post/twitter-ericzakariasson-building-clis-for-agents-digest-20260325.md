@@ -22,7 +22,7 @@ type: post-digest
 
 | Aspect | Details |
 |--------|---------|
-| **Author** | eric zakariasson (@ericzakariasson) |
+| **Author** | Eric Zakariasson (@ericzakariasson) |
 | **Role / Affiliation** | @cursor_ai |
 | **Expertise** | Developer Tooling, AI Assistants, Software Engineering |
 | **Notable Work** | Works at Cursor AI |
