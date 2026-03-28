@@ -3,16 +3,11 @@
   "description": "User configuration for Follow Builders skill. Stored at ~/.follow-builders/config.json",
   "type": "object",
   "properties": {
-    "platform": {
-      "type": "string",
-      "enum": ["openclaw", "other"],
-      "description": "Detected platform: openclaw or other (Claude Code, Cursor, etc.)"
-    },
     "language": {
       "type": "string",
-      "enum": ["en", "zh", "bilingual"],
+      "enum": ["en"],
       "default": "en",
-      "description": "Digest language: en (English), zh (Chinese), bilingual (both)"
+      "description": "Digest language: en (English)"
     },
     "timezone": {
       "type": "string",

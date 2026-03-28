@@ -26,31 +26,34 @@ import { homedir } from 'os';
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 
-const FEED_X_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-x.json';
-const FEED_PODCASTS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-podcasts.json';
-const FEED_BLOGS_URL = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/feed-blogs.json';
+import { resolve } from 'path';
 
-const PROMPTS_BASE = 'https://raw.githubusercontent.com/zarazhangrui/follow-builders/main/prompts';
+const SKILL_DIR = resolve('.vibe/skills/follow-builders');
+
 const PROMPT_FILES = [
   'summarize-podcast.md',
   'summarize-tweets.md',
   'summarize-blogs.md',
-  'digest-intro.md',
-  'translate.md'
+  'digest-intro.md'
 ];
 
-// -- Fetch helpers -----------------------------------------------------------
+// -- File helpers ------------------------------------------------------------
 
-async function fetchJSON(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.json();
+async function fetchJSON(filename) {
+  try {
+    const raw = await readFile(join(SKILL_DIR, filename), 'utf8');
+    return JSON.parse(raw);
+  } catch (err) {
+    return null;
+  }
 }
 
-async function fetchText(url) {
-  const res = await fetch(url);
-  if (!res.ok) return null;
-  return res.text();
+async function fetchText(filename) {
+  try {
+    return await readFile(join(SKILL_DIR, 'prompts', filename), 'utf8');
+  } catch (err) {
+    return null;
+  }
 }
 
 // -- Main --------------------------------------------------------------------
@@ -74,21 +77,20 @@ async function main() {
 
   // 2. Fetch all three feeds
   const [feedX, feedPodcasts, feedBlogs] = await Promise.all([
-    fetchJSON(FEED_X_URL),
-    fetchJSON(FEED_PODCASTS_URL),
-    fetchJSON(FEED_BLOGS_URL)
+    fetchJSON('feed-x.json'),
+    fetchJSON('feed-podcasts.json'),
+    fetchJSON('feed-blogs.json')
   ]);
 
   if (!feedX) errors.push('Could not fetch tweet feed');
   if (!feedPodcasts) errors.push('Could not fetch podcast feed');
   if (!feedBlogs) errors.push('Could not fetch blog feed');
 
-  // 3. Load prompts with priority: user custom > remote (GitHub) > local default
+  // 3. Load prompts with priority: user custom > local repository default
   //
   // If the user has a custom prompt at ~/.follow-builders/prompts/<file>,
   // use that (they personalized it — don't overwrite with remote updates).
-  // Otherwise, fetch the latest from GitHub so they get central improvements.
-  // If GitHub is unreachable, fall back to the local copy shipped with the skill.
+  // Otherwise, use the local copy shipped with the skill.
   const prompts = {};
   const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
   const localPromptsDir = join(scriptDir, '..', 'prompts');
@@ -105,14 +107,7 @@ async function main() {
       continue;
     }
 
-    // Priority 2: latest from GitHub (central updates)
-    const remote = await fetchText(`${PROMPTS_BASE}/${filename}`);
-    if (remote) {
-      prompts[key] = remote;
-      continue;
-    }
-
-    // Priority 3: local copy shipped with the skill
+    // Priority 2: local copy shipped with the skill
     if (existsSync(localPath)) {
       prompts[key] = await readFile(localPath, 'utf-8');
     } else {
