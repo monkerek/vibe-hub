@@ -20,17 +20,15 @@ A digest delivered directly into your chat with:
 
 ## Quick Start
 
-1. Invoke the skill using the `/ai` prompt or ask for your daily digest.
-2. The agent walks you through an onboarding process to select your preferred schedule.
-3. Your digest is displayed directly in your agent terminal.
+1. Invoke the skill using the `/ai` prompt or ask for your digest.
+2. Your digest is displayed directly in your agent terminal.
 
 No API keys needed — all content is fetched centrally.
 
 ## Changing Settings
 
-Your delivery preferences are configurable through conversation. Just tell your agent:
+Your preferences are configurable through conversation. Just tell your agent:
 
-- "Switch to weekly digests on Monday mornings"
 - "Make the summaries shorter"
 - "Show me my current settings"
 
@@ -47,7 +45,7 @@ Tell your agent what you want — "Make summaries more concise," "Focus on actio
 insights," "Use a more casual tone." The agent updates the prompts for you.
 
 **Direct editing (power users):**
-Edit the files in the `prompts/` folder:
+Edit the files in the `.vibe/skills/follow-builders/prompts/` folder:
 - `summarize-podcast.md` — how podcast episodes are summarized
 - `summarize-tweets.md` — how X/Twitter posts are summarized
 - `summarize-blogs.md` — how blog posts are summarized
