@@ -76,7 +76,13 @@ async function sendTelegram(text, botToken, chatId) {
     }
     // Try to split at a newline near the limit
     let splitAt = remaining.lastIndexOf('\n', MAX_LEN);
+    // If no good newline, try space
+    if (splitAt < MAX_LEN * 0.5) {
+      splitAt = remaining.lastIndexOf(' ', MAX_LEN);
+    }
+    // Hard split fallback
     if (splitAt < MAX_LEN * 0.5) splitAt = MAX_LEN;
+
     chunks.push(remaining.slice(0, splitAt));
     remaining = remaining.slice(splitAt);
   }
@@ -100,7 +106,7 @@ async function sendTelegram(text, botToken, chatId) {
       const err = await res.json();
       // If Markdown parsing fails, retry without parse_mode
       if (err.description && err.description.includes("can't parse")) {
-        await fetch(
+        const retryRes = await fetch(
           `https://api.telegram.org/bot${botToken}/sendMessage`,
           {
             method: 'POST',
@@ -112,6 +118,10 @@ async function sendTelegram(text, botToken, chatId) {
             })
           }
         );
+        if (!retryRes.ok) {
+          const retryErr = await retryRes.json();
+          throw new Error(`Telegram API error on retry: ${retryErr.description}`);
+        }
       } else {
         throw new Error(`Telegram API error: ${err.description}`);
       }
@@ -126,7 +136,8 @@ async function sendTelegram(text, botToken, chatId) {
 
 // Sends the digest via Resend's email API.
 // The user provides their own Resend API key and email address.
-async function sendEmail(text, apiKey, toEmail) {
+async function sendEmail(text, apiKey, toEmail, language) {
+  const langCode = language === 'zh' ? 'zh-CN' : 'en-US';
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -136,7 +147,7 @@ async function sendEmail(text, apiKey, toEmail) {
     body: JSON.stringify({
       from: 'AI Builders Digest <digest@resend.dev>',
       to: [toEmail],
-      subject: `AI Builders Digest — ${new Date().toLocaleDateString('en-US', {
+      subject: `AI Builders Digest — ${new Date().toLocaleDateString(langCode, {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
       })}`,
       text: text
@@ -187,9 +198,10 @@ async function main() {
       case 'email': {
         const apiKey = process.env.RESEND_API_KEY;
         const toEmail = delivery.email;
+        const language = config.language || 'en';
         if (!apiKey) throw new Error('RESEND_API_KEY not found in .env');
         if (!toEmail) throw new Error('delivery.email not found in config.json');
-        await sendEmail(digestText, apiKey, toEmail);
+        await sendEmail(digestText, apiKey, toEmail, language);
         console.log(JSON.stringify({
           status: 'ok',
           method: 'email',

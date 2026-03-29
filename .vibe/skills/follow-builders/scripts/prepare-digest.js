@@ -26,9 +26,11 @@ import { homedir } from 'os';
 const USER_DIR = join(homedir(), '.follow-builders');
 const CONFIG_PATH = join(USER_DIR, 'config.json');
 
-import { resolve } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-const SKILL_DIR = resolve('.vibe/skills/follow-builders');
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
+const SKILL_DIR = resolve(SCRIPT_DIR, '..');
 
 const PROMPT_FILES = [
   'summarize-podcast.md',
@@ -92,8 +94,7 @@ async function main() {
   // use that (they personalized it — don't overwrite with remote updates).
   // Otherwise, use the local copy shipped with the skill.
   const prompts = {};
-  const scriptDir = decodeURIComponent(new URL('.', import.meta.url).pathname);
-  const localPromptsDir = join(scriptDir, '..', 'prompts');
+  const localPromptsDir = join(SCRIPT_DIR, '..', 'prompts');
   const userPromptsDir = join(USER_DIR, 'prompts');
 
   for (const filename of PROMPT_FILES) {

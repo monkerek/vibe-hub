@@ -15,7 +15,8 @@
 
 import { readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
 // -- Constants ---------------------------------------------------------------
 
@@ -28,7 +29,7 @@ const MAX_TWEETS_PER_USER = 3;
 const MAX_ARTICLES_PER_BLOG = 3;
 
 // State file lives in the repo root so it gets committed by GitHub Actions
-const SCRIPT_DIR = decodeURIComponent(new URL('.', import.meta.url).pathname);
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const STATE_PATH = join(SCRIPT_DIR, '..', 'state-feed.json');
 
 // -- State Management --------------------------------------------------------
@@ -356,18 +357,32 @@ function parseClaudeBlogIndex(html) {
   const articles = [];
   const seenSlugs = new Set();
 
+  // First, extract all published dates from time tags
+  const dates = [];
+  const timeRegex = /<time datetime="([^"]+)"[^>]*>/gi;
+  let timeMatch;
+  while ((timeMatch = timeRegex.exec(html)) !== null) {
+    dates.push(timeMatch[1]);
+  }
+
   // Match blog post links — they follow the pattern /blog/<slug>
-  // We capture surrounding context to extract titles and dates
   const linkRegex = /href="\/blog\/([a-z0-9-]+)"/gi;
   let linkMatch;
+  let dateIndex = 0;
+
   while ((linkMatch = linkRegex.exec(html)) !== null) {
     const slug = linkMatch[1];
     if (seenSlugs.has(slug)) continue;
     seenSlugs.add(slug);
+
+    // Assign the next available date to this post
+    const publishedAt = dates[dateIndex] || null;
+    dateIndex++;
+
     articles.push({
       title: '', // Will be filled when we fetch the article page
       url: `https://claude.com/blog/${slug}`,
-      publishedAt: null,
+      publishedAt: publishedAt,
       description: ''
     });
   }

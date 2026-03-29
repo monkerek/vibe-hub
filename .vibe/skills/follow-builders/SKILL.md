@@ -32,7 +32,7 @@ internet connection. Otherwise, use whatever content is in the JSON.
 
 ### Step 2: Check for content
 
-If `stats.podcastEpisodes` is 0 AND `stats.xBuilders` is 0, tell the user:
+If `stats.podcastEpisodes` is 0 AND `stats.xBuilders` is 0 AND `stats.blogPosts` is 0, tell the user:
 "No new updates from your builders today. Check back tomorrow!" Then stop.
 
 ### Step 3: Remix content
